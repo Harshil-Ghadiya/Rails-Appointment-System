@@ -1,8 +1,8 @@
 class Users::RegistrationsController < Devise::RegistrationsController
-
   def new 
     super 
   end
+
  def create
     # Organization create 
     @organization = Organization.new(
@@ -37,6 +37,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
       @organization = Organization.new # Fresh Organization object
         render :new,  status: :unprocessable_entity
       end
+
     else
       build_resource(sign_up_params)
       flash.now[:alert] = @organization.errors.full_messages.join(", ")
@@ -46,3 +47,4 @@ class Users::RegistrationsController < Devise::RegistrationsController
     end
   end
 end
+

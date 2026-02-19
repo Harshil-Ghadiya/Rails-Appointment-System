@@ -1,0 +1,19 @@
+<div class="sidebar" style="width: 250px; background: #2c3e50; color: white; height: 100vh; position: fixed; left: 0; top: 0; padding: 20px; display: flex; flex-direction: column; z-index: 1000;">
+  <h2 style="font-size: 20px; border-bottom: 1px solid #455a64; padding-bottom: 15px;"><%= current_user.organization.name %></h2>
+  
+  <nav style="margin-top: 20px; flex-grow: 1;">
+    <ul style="list-style: none; padding: 0;">
+      <li style="margin-bottom: 15px;"><%= link_to "🏠 Dashboard", admin_dashboard_path, style: "color: white; text-decoration: none; display: block; padding: 8px; border-radius: 4px;" %></li>
+      <li style="margin-bottom: 15px;"><%= link_to "⚙️ Form Fields", admin_field_settings_path, style: "color: white; text-decoration: none; display: block; padding: 8px;" %></li>
+      <li style="margin-bottom: 15px;"><%= link_to "⏰ Booking Time", admin_booking_controls_path, style: "color: white; text-decoration: none; display: block; padding: 8px;" %></li>
+      <li style="margin-bottom: 15px;"><%= link_to "🚫 Reserved Tokens", admin_reserved_tokens_path, style: "color: white; text-decoration: none; display: block; padding: 8px;" %></li>
+      <li style="margin-bottom: 15px;"><%= link_to "📢 Manage Notices", admin_notices_path, style: "color: white; text-decoration: none; display: block; padding: 8px;" %></li>
+      <li style="margin-bottom: 15px;"><%= link_to "🔒 Change Password", edit_admin_profile_path, style: "color: white; text-decoration: none; display: block; padding: 8px;" %></li>
+    </ul>
+  </nav>
+
+  <div class="logout-section" style="border-top: 1px solid #455a64; padding-top: 15px;">
+    <%= button_to "Logout Admin", destroy_user_session_path, method: :delete, data: { turbo: false }, 
+        style: "background: #dc3545; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer;" %>
+  </div>
+</div>

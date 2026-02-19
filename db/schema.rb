@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_17_125400) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_19_101619) do
   create_table "appointments", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "organization_id"
@@ -19,7 +19,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_125400) do
     t.string "patient_phone"
     t.integer "status"
     t.string "token_number"
+    t.integer "token_number_only"
     t.datetime "updated_at", null: false
+    t.index ["token_number_only"], name: "index_appointments_on_token_number_only"
   end
 
   create_table "booking_controls", force: :cascade do |t|
@@ -52,6 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_125400) do
   create_table "organizations", force: :cascade do |t|
     t.text "address"
     t.datetime "created_at", null: false
+    t.string "doctor_status"
     t.string "email"
     t.boolean "is_approved"
     t.boolean "is_booking_stopped"

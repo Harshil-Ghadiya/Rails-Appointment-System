@@ -1,0 +1,15 @@
+<div style="display: flex;">
+  <%= render 'admin/shared/sidebar' %>
+  <div style="margin-left: 270px; padding: 20px; flex: 1;">
+    <h2>Manage Reserved Tokens </h2>
+    <%= form_with url: admin_reserved_tokens_path, local: true do |f| %>
+      <%= f.number_field :reserved_token, placeholder: "Token number to Reserved" %>
+      <%= f.submit "Reserved Token" %>
+    <% end %>
+    <hr>
+    <h3>Currently Blocked:</h3>
+    <% @reserved_tokens.each do |rt| %>
+      <p>Token #<%= rt.reserved_token %> <%= link_to "Remove", admin_reserved_token_path(rt), method: :delete %></p>
+    <% end %>
+  </div>
+</div>
