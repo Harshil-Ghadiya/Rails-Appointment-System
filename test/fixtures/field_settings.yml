@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  organization_id: 1
+  field_name: MyString
+  is_required: false
+
+two:
+  organization_id: 1
+  field_name: MyString
+  is_required: false

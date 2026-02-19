@@ -1,0 +1,52 @@
+<h1>All Organization List </h1>
+
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f4f4f4;">
+  <h2>Super Admin Dashboard</h2>
+  
+  <div class="header-actions">
+    <%# Aa Logout button khali ahiya j dekhase %>
+    <%= button_to "Logout Super Admin", destroy_user_session_path, 
+                  method: :delete, 
+                  data: { turbo: false }, 
+                  class: "btn-danger",
+                  style: "background-color: #dc3545; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;" %>
+  </div>
+</div>
+
+<hr>
+<table class="org-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+  <thead>
+    <tr style="background: #333; color: white;">
+      <th style="padding: 12px;">Name</th>
+      <th style="padding: 12px;">Admin Email</th>
+      <th style="padding: 12px;">Status</th>
+      <th style="padding: 12px;">Toggle Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @organizations.each do |org| %>
+      <tr style="border-bottom: 1px solid #ddd; text-align: center;">
+        <td style="padding: 10px;"><%= org.name %></td>
+        <td style="padding: 10px;"><%= org.email %></td>
+        <td style="padding: 10px;">
+          <span id="status-badge-<%= org.id %>" class="badge <%= org.is_approved ? 'status-active' : 'status-pending' %>">
+            <%= org.is_approved ? "Active" : "Inactive" %>
+          </span>
+        </td>
+        <td style="padding: 10px;">
+          <%# Toggle Switch UI %>
+          <label class="switch">
+            <%# Switch click thase tyare automatic sachi method call thase %>
+            <%= button_to (org.is_approved ? superadmin_inactive_organization_path(org) : superadmin_approve_organization_path(org)), 
+                method: :patch, 
+                form: { style: 'display:inline;' },
+                class: "toggle-btn-overlay" do %>
+              <input type="checkbox" <%= org.is_approved ? 'checked' : '' %> disabled>
+              <span class="slider round"></span>
+            <% end %>
+          </label>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

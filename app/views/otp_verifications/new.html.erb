@@ -1,0 +1,12 @@
+<h2>Verify Twilio OTP</h2>
+
+<%= form_tag verify_otp_path, method: :post do %>
+  <div class="field">
+    <p><%= label_tag :otp, "Enter 6-Digit OTP sent to your mobile" %></p>
+    <p><%= text_field_tag :otp, nil, placeholder: "123456", required: true, maxlength: 6 %></p>
+  </div>
+
+  <div class="actions">
+    <%= submit_tag "Verify & Login" %>
+  </div>
+<% end %>

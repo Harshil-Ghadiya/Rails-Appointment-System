@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  organization_id: 1
+  day_name: MyString
+  token_prefix: MyString
+  start_time: 2026-02-16 14:16:26
+  end_time: 2026-02-16 14:16:26
+
+two:
+  organization_id: 1
+  day_name: MyString
+  token_prefix: MyString
+  start_time: 2026-02-16 14:16:26
+  end_time: 2026-02-16 14:16:26

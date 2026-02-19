@@ -1,0 +1,36 @@
+<h2>self Sign up Organization </h2>
+
+<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+  <%= render "devise/shared/error_messages", resource: resource %>
+
+
+<div class="field">
+  <p><%= f.label :organization_name %></p>
+  <p><%= f.text_field :name, autofocus: true, required: true %></p>
+  </div>
+
+<div class="field">
+    <p><%= label_tag "UserAdmin Name", "Admin Full Name" %></p>
+    <p><%= text_field_tag "user[admin_name]", nil, required: true %></p>
+  </div>
+<div class="field">
+  <p><%= f.label :email %></p>
+  <p><%= f.email_field :email,  autocomplete: "email", required: true %></p>
+  </div>
+
+<div class="field">
+  <p><%= f.label :phone_number %></p>
+  <p><%= f.text_field :phone_number, required: true %></p>
+  </div>
+
+  <div class="field">
+    <p><%= f.label :address %></p>
+    <p><%= f.text_field :address %></p>
+  </div>
+
+  <div class="action">
+    <%= f.submit "Sign up Organization" %>
+  </div>
+<% end %>
+
+<%= render "devise/shared/links" %>
