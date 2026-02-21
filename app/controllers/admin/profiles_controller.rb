@@ -1,5 +1,6 @@
 class Admin::ProfilesController < ApplicationController
-  def edit; @user = current_user; end
+  def edit; @user = current_user;
+ end
 
   def update
     @user = current_user
@@ -11,3 +12,4 @@ class Admin::ProfilesController < ApplicationController
     end
   end
 end
+

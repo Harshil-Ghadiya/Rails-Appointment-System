@@ -1,0 +1,42 @@
+<%# Req 1, 2, 5: Live Updates using Turbo Streams %>
+<%= turbo_stream_from "organization_#{@organization.id}_updates" %>
+
+<div style="text-align: center; padding: 50px; font-family: sans-serif;">
+  <div style="display: inline-block; background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); min-width: 320px;">
+    <h3 style="color: #95a5a6; margin: 0;">YOUR TOKEN</h3>
+    
+    <h1 style="font-size: 80px; margin: 15px 0; color: #2ecc71;">
+      <%# AA SUDHARO: Aaje je divas che eno prefix sodho %>
+      <% today_prefix = @organization.booking_controls.find_by(day_name: Time.now.strftime("%A"))&.token_prefix || "TK" %>
+      <%= today_prefix %>-<%= @appointment.token_number %>
+    </h1>
+
+    <p style="font-size: 18px; color: #34495e;">Hello, <strong><%= @appointment.patient_name %></strong></p>
+
+    <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+      
+      <div id="status_section">
+        <div style="margin-bottom: 15px;">
+          <small>Doctor Availability:</small><br>
+          <strong style="color: <%= @organization.is_approved ? '#2ecc71' : '#e74c3c' %>;">
+            ● <%= @organization.is_approved ? "In Clinic" : "Not Available" %>
+          </strong>
+        </div>
+
+        <div style="display: flex; justify-content: space-around;">
+          <div>
+            <small>Now Serving</small><br>
+            <strong style="font-size: 24px; color: #e67e22;">#<%= @current_serving %></strong>
+          </div>
+          <div>
+            <small>Queue End</small><br>
+            <strong style="font-size: 24px; color: #7f8c8d;">#<%= @last_token %></strong>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
+    <p style="margin-top: 20px; font-size: 12px; color: #bdc3c7;">Status updates automatically. No need to refresh.</p>
+  </div>
+</div>

@@ -24,8 +24,7 @@ namespace :admin do
     resources :booking_controls, only: [:index, :update]
     
     # Req 4: Reserved Tokens
-    resources :reserved_tokens, only: [:index, :create, :destroy]
-    
+resources :reserved_tokens, only: [:index, :create, :destroy]    
     # Req 7: Field Settings (Mandatory/Optional Fields)
     resources :field_settings, only: [:index] do
       collection { patch :update_all }

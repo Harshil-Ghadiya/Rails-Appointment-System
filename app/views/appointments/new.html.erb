@@ -1,0 +1,45 @@
+<div style="max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 12px; background: #fff; box-shadow: 0 5px 20px rgba(0,0,0,0.1); font-family: sans-serif;">
+  <h2 style="text-align: center; color: #2c3e50;"><%= @organization.name %></h2>
+
+  <%# Notices logic %>
+  <% @notices.each do |notice| %>
+    <div style="background: #fff3cd; padding: 12px; border-radius: 6px; margin-bottom: 20px; border-left: 5px solid #ffc107;">
+      <strong> Note:</strong> <%= notice.content %>
+    </div>
+  <% end %>
+
+  <%= form_with model: @appointment, local: true do |f| %>
+    <%= f.hidden_field :organization_id %>
+
+    <%# 1. LOOP THROUGH ALL ADMIN SETTINGS %>
+    <% @field_settings.each do |setting| %>
+      
+      <% if setting.is_required %>
+        <div style="margin-bottom: 15px;">
+          
+          <% field_name_raw = setting.field_name.downcase %>
+          
+          <% if field_name_raw.include?('name') %>
+            <%= f.label :patient_name, "Patient Name *", style: "display: block; font-weight: bold; margin-bottom: 5px;" %><br>
+            <%= f.text_field :patient_name, required: true, style: "width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;" %>
+          
+          <% elsif field_name_raw.include?('email') %>
+            <%= f.label :patient_email, "Email Address *", style: "display: block; font-weight: bold; margin-bottom: 5px;" %><br>
+            <%= f.email_field :patient_email, required: true, style: "width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;" %>
+
+          <% elsif field_name_raw.include?('phone') %>
+            <%= f.label :patient_phone, "Phone Number *", style: "display: block; font-weight: bold; margin-bottom: 5px;" %><br>
+            <%= f.text_field :patient_phone, required: true, style: "width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;" %>
+
+          <% elsif field_name_raw.include?('address') %>
+            <%= f.label :patient_address, "Address *", style: "display: block; font-weight: bold; margin-bottom: 5px;" %><br>
+            <%= f.text_area :patient_address, required: true, rows: 2, style: "width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;" %>
+          <% end %>
+
+        </div>
+      <% end %>
+    <% end %>
+
+    <%= f.submit "Book Appointment", style: "width: 100%; background: #27ae60; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer;" %>
+  <% end %>
+</div>

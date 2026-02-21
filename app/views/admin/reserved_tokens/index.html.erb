@@ -1,15 +1,37 @@
 <div style="display: flex;">
   <%= render 'admin/shared/sidebar' %>
-  <div style="margin-left: 270px; padding: 20px; flex: 1;">
-    <h2>Manage Reserved Tokens </h2>
-    <%= form_with url: admin_reserved_tokens_path, local: true do |f| %>
-      <%= f.number_field :reserved_token, placeholder: "Token number to Reserved" %>
-      <%= f.submit "Reserved Token" %>
-    <% end %>
-    <hr>
-    <h3>Currently Blocked:</h3>
-    <% @reserved_tokens.each do |rt| %>
-      <p>Token #<%= rt.reserved_token %> <%= link_to "Remove", admin_reserved_token_path(rt), method: :delete %></p>
-    <% end %>
+  
+  <div style="margin-left: 270px; padding: 30px; flex: 1; background: #f9fbff; min-height: 100vh;">
+    <h2 style="color: #2c3e50;"> Manage Reserved Tokens</h2>
+    <p style="color: #7f8c8d;">Tokens added here will be skipped for regular patient bookings.</p>
+
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px;">
+      <%= form_with model: [:admin, ReservedToken.new], local: true, style: "display: flex; gap: 10px;" do |f| %>
+        <%= f.number_field :token_number, placeholder: "e.g. 5", required: true, 
+            style: "padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 200px;" %>
+        <%= f.submit "Reserve This Number", 
+            style: "background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;" %>
+      <% end %>
+    </div>
+
+    <h3 style="color: #34495e;">Currently Blocked:</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+      <% if @reserved_tokens.any? %>
+        <% @reserved_tokens.each do |rt| %>
+          <div style="background: #fff; border: 1px solid #e0e0e0; padding: 10px 20px; border-radius: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <strong style="font-size: 18px; color: #c0392b;">#<%= rt.token_number %></strong>
+            
+            <%= button_to admin_reserved_token_path(rt), 
+                method: :delete,
+                data: { turbo_confirm: "Are you sure?" }, 
+                style: "text-decoration: none; color: #95a5a6; font-size: 18px; font-weight: bold;" do %>
+              ×
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <p style="color: #bdc3c7;">No tokens reserved yet.</p>
+      <% end %>
+    </div>
   </div>
 </div>

@@ -17,7 +17,7 @@ class Appointment < ApplicationRecord
     next_num = last_num + 1
     
     # Requirement 4: Skip reserved tokens
-    while organization.reserved_tokens.exists?(reserved_token: next_num)
+    while organization.reserved_tokens.exists?(token_number: next_num)
       next_num += 1
     end
 
