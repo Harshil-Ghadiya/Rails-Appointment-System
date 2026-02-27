@@ -1,0 +1,26 @@
+<div id="field_settings_container">
+  <%= form_with url: update_all_admin_field_settings_path, method: :patch do |f| %>
+    <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #eef2f3;">
+      
+      <% settings.each do |setting| %>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #f1f1f1;">
+          <div>
+            <strong style="font-size: 17px; color: #2c3e50;"><%= setting.field_name.titleize %></strong>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #95a5a6;">Show this field on the public booking form</p>
+          </div>
+          
+          <label style="position: relative; display: inline-block; cursor: pointer;">
+            <input type="hidden" name="fields[<%= setting.id %>][is_required]" value="0">
+            <input type="checkbox" name="fields[<%= setting.id %>][is_required]" value="1" <%= 'checked' if setting.is_required %> 
+                   style="width: 28px; height: 28px; cursor: pointer; accent-color: #3498db;">
+          </label>
+        </div>
+      <% end %>
+
+      <div style="margin-top: 35px; text-align: left;">
+        <%= f.submit "Save Form Changes", 
+            style: "background: #3498db; color: white; border: none; padding: 14px 40px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);" %>
+      </div>
+    </div>
+  <% end %>
+</div>

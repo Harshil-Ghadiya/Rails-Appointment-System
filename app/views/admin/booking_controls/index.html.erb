@@ -1,6 +1,6 @@
+<%= turbo_frame_tag "main_content" do %>
 <div style="display: flex;">
-  <%= render 'admin/shared/sidebar' %>
-  <div style="margin-left: 270px; padding: 30px; flex: 1;">
+  <div style="margin-left: 50px; padding: 30px; flex: 1;">
     <h3 style="color: #2c3e50;"> Weekly Booking Schedule</h3>
     <p style="color: #7f8c8d;">Set opening and closing hours for each day.</p>
 
@@ -9,22 +9,32 @@
         <tr style="background: #f8f9fa; border-bottom: 2px solid #eee;">
           <th style="padding: 15px;">Day</th>
           <th>Prefix</th>
-          <th>Start Time (Open)</th>
-          <th>End Time (Close)</th>
+          <th style="color: #181a1c;">Morning (Start - End)</th>     
+          <th style="color: #e67e22;">Evening (Start - End)</th>   
           <th>Action</th>
         </tr>
+        
         <% @booking_controls.each do |control| %>
-          <%= form_with model: [:admin, control], local: true do |f| %>
-            <tr style="border-bottom: 1px solid #f1f1f1;">
-              <td style="padding: 15px;"><strong><%= control.day_name %></strong></td>
-              <td><%= f.text_field :token_prefix, style: "width: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %></td>
-              <td><%= f.time_field :start_time, value: control.start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %></td>
-              <td><%= f.time_field :end_time, value: control.end_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %></td>
-              <td><%= f.submit "Update", style: "background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;" %></td>
-            </tr>
-          <% end %>
+          <tbody id="booking_control_<%= control.id %>">
+            <%= form_with model: [:admin, control] do |f| %>
+              <tr style="border-bottom: 1px solid #f1f1f1;">
+                <td style="padding: 15px;"><strong><%= control.day_name %></strong></td>
+                <td><%= f.text_field :token_prefix, style: "width: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %></td>
+                <td>
+                  <%= f.time_field :morning_start_time, value: control.morning_start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %> -
+                  <%= f.time_field :morning_end_time, value: control.morning_end_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
+                </td> 
+                <td>
+                  <%= f.time_field :evening_start_time, value: control.evening_start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %> -
+                  <%= f.time_field :evening_end_time, value: control.evening_end_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
+                </td>
+                <td><%= f.submit "Update", style: "background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;" %></td>
+              </tr>
+            <% end %>
+          </tbody>
         <% end %>
       </table>
     </div>
   </div>
 </div>
+<% end %>

@@ -1,0 +1,6 @@
+<%= form_with model: [:admin, ReservedToken.new], style: "display: flex; gap: 10px;" do |f| %>
+  <%= f.number_field :token_number, placeholder: "e.g. 5", required: true, 
+      style: "padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 200px;" %>
+  <%= f.submit "Reserve This Number", 
+      style: "background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;" %>
+<% end %>

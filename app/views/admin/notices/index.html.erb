@@ -1,11 +1,10 @@
+<%= turbo_frame_tag "main_content" do %>
 <div style="display: flex;">
-  <%= render 'admin/shared/sidebar' %>
-  
-  <div style="margin-left: 270px; padding: 30px; flex: 1; background: #f4f7f6; min-height: 100vh;">
+  <div style="margin-left: 50px; padding: 30px; flex: 1; background: #f4f7f6; min-height: 100vh;">
     <h2 style="color: #2c3e50;">📢 Manage Clinic Notices</h2>
 
-    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px;">
-      <%= form_with model: [:admin, @notice], local: true do |f| %>
+    <div id="notice_form_container" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px;">
+      <%= form_with model: [:admin, @notice] do |f| %>
         <div style="margin-bottom: 15px;">
           <%= f.label :notice_type, "Notice Type", style: "display: block; font-weight: bold; margin-bottom: 5px;" %>
           <%= f.select :notice_type, Notice.notice_types.keys.map { |k| [k.humanize, k] }, {}, 
@@ -23,9 +22,12 @@
     </div>
 
     <h3 style="color: #34495e;">Active Notices</h3>
-    <div style="display: grid; gap: 15px;">
+    
+    <%# --- 2. List Container ID (Navi notice ahiya "prepend" thase) --- %>
+    <div id="notices_list" style="display: grid; gap: 15px;">
       <% @notices.each do |n| %>
-        <div style="background: white; padding: 15px; border-radius: 8px; border-left: 5px solid <%= n.general? ? '#3498db' : '#f1c40f' %>; display: flex; justify-content: space-between; align-items: center;">
+        <%# --- 3. Darek notice row mate unique ID (Delete karva mate) --- %>
+        <div id="<%= dom_id(n) %>" style="background: white; padding: 15px; border-radius: 8px; border-left: 5px solid <%= n.general? ? '#3498db' : '#f1c40f' %>; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <span style="font-size: 12px; text-transform: uppercase; font-weight: bold; color: #7f8c8d;">
               <%= n.notice_type.humanize %>
@@ -39,9 +41,11 @@
           <% end %>
         </div>
       <% end %>
+
       <% if @notices.empty? %>
-        <p style="color: #bdc3c7;">No notices posted yet.</p>
+        <p id="no_notices_msg" style="color: #bdc3c7;">No notices posted yet.</p>
       <% end %>
     </div>
   </div>
 </div>
+<% end %>

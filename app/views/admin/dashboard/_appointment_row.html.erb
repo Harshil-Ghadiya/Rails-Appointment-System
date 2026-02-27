@@ -1,0 +1,53 @@
+<tr  id= "appt_row_<%= appt.id %>" style="border-bottom: 1px solid #f4f7f6; transition: background 0.2s;">
+  <%# --- TOKEN SECTION (15%) --- %>
+  <td style="padding: 15px 10px; width: 15%; vertical-align: middle;">
+    <% if appt.status != 'pending' %>
+      <small style="color: #95a5a6; display: block; font-size: 9px; margin-bottom: 2px;">TOKEN</small>
+    <% end %>
+    <span style="font-weight: bold; font-size: 15px; color: #2c3e50;"><%= appt.token_number %></span>
+  </td>
+
+  <%# --- PATIENT NAME SECTION (45%) --- %>
+  <td style="padding: 15px 10px; width: 45%; vertical-align: middle;">
+    <% if appt.status != 'pending' %>
+      <small style="color: #95a5a6; display: block; font-size: 9px; margin-bottom: 2px;">PATIENT NAME</small>
+    <% end %>
+    <span style="color: #34495e; font-weight: 500;"><%= appt.patient_name %></span>
+  </td>
+
+  <%# --- STATUS SECTION (15%) --- %>
+  <td style="padding: 15px 10px; width: 15%; text-align: center; vertical-align: middle;">
+    <% if appt.status != 'pending' %>
+      <small style="color: #95a5a6; display: block; font-size: 9px; margin-bottom: 4px;">STATUS</small>
+    <% end %>
+    <% color = case appt.status; when 'completed' then '#27ae60'; when 'skipped' then '#f39c12'; when 'deleted' then '#e74c3c'; else '#3498db'; end %>
+    <span style="background: <%= color %>; color: white; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; white-space: nowrap;">
+      <%= appt.status %>
+    </span>
+  </td>
+
+  <%# --- ACTIONS SECTION (25%) --- %>
+  <td style="padding: 15px 10px; width: 25%; text-align: right; vertical-align: middle;">
+    <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center;">
+      <% if appt.status == 'pending' %>
+        <%= link_to admin_update_appt_status_path(appt.id, 'completed'), 
+            data: { turbo_method: :patch }, 
+            style: "color: #27ae60; text-decoration: none; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 4px;" do %>
+          ✅ <span style="border-bottom: 1px solid #27ae60;">Complete</span>
+        <% end %>
+
+        <%= link_to admin_update_appt_status_path(appt.id, 'skipped'), 
+            data: { turbo_method: :patch }, 
+            style: "color: #f39c12; text-decoration: none; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 4px;" do %>
+          ⏭️ <span style="border-bottom: 1px solid #f39c12;">Skipped</span>
+        <% end %>
+        
+        <%= link_to admin_update_appt_status_path(appt.id, 'deleted'), 
+            data: { turbo_method: :patch, turbo_confirm: "Are you sure?" }, 
+            style: "color: #e74c3c; text-decoration: none; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 4px;" do %>
+          🗑️ <span style="border-bottom: 1px solid #e74c3c;">Delete</span>
+        <% end %>
+      <% end %>
+    </div>
+  </td>
+</tr>

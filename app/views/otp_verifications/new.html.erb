@@ -1,5 +1,7 @@
 <h2>Verify Twilio OTP</h2>
-
+<% content_for :head do %>
+  <meta name="turbo-cache-control" content="no-cache">
+<% end %>
 <%= form_tag verify_otp_path, method: :post do %>
   <div class="field">
     <p><%= label_tag :otp, "Enter 6-Digit OTP sent to your mobile" %></p>

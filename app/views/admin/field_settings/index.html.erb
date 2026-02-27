@@ -1,30 +1,45 @@
-<div style="display: flex;">
-  <%= render 'admin/shared/sidebar' %>
-  <div style="margin-left: 270px; padding: 30px; flex: 1; background: #f4f7f6;">
-    <h2 style="color: #2c3e50;">⚙️ Patient Form Settings</h2>
-    <p>Check the fields you want to show on patient booking form:</p>
 
-    <%= form_with url: update_all_admin_field_settings_path, method: :patch, local: true do |f| %>
-      <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-        
-        <% @settings.each do |setting| %>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
-            <div>
-              <strong style="font-size: 16px; color: #34495e;"><%= setting.field_name.titleize %></strong>
-              <p style="margin: 0; font-size: 12px; color: #95a5a6;">Show this field to patient</p>
+<%= turbo_frame_tag "main_content" do %>
+
+<div class="settings-wrapper" style="background: #f1f7f5; min-height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif;">
+  
+  <div style="margin-left: 50px; padding: 40px; max-width: 1000px;">
+    
+    <div style="margin-bottom: 30px;">
+      <h2 style="color: #2c3e50; margin: 0; font-size: 28px;">⚙️ Patient Form Settings</h2>
+      <p style="color: #7f8c8d; margin-top: 8px;">Check the fields you want to show on patient booking form:</p>
+    </div>
+
+    <%# --- STEP 1: Form container ne ID aapi --- %>
+    <div id="field_settings_container">
+      
+      <%# --- STEP 2: data turbo_frame kadhi nakhyu jethi Toast live aavi shake --- %>
+      <%= form_with url: update_all_admin_field_settings_path, method: :patch do |f| %>
+        <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #eef2f3;">
+          
+          <% @settings.each do |setting| %>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #f1f1f1;">
+              <div>
+                <strong style="font-size: 17px; color: #2c3e50;"><%= setting.field_name.titleize %></strong>
+                <p style="margin: 4px 0 0 0; font-size: 13px; color: #95a5a6;">Show this field on the public booking form</p>
+              </div>
+              
+              <label style="position: relative; display: inline-block; cursor: pointer;">
+                <input type="hidden" name="fields[<%= setting.id %>][is_required]" value="0">
+                <input type="checkbox" name="fields[<%= setting.id %>][is_required]" value="1" <%= 'checked' if setting.is_required %> 
+                       style="width: 28px; height: 28px; cursor: pointer; accent-color: #3498db;">
+              </label>
             </div>
-            
-            <label style="cursor: pointer;">
-              <input type="hidden" name="fields[<%= setting.id %>][is_required]" value="0">
-              <input type="checkbox" name="fields[<%= setting.id %>][is_required]" value="1" <%= 'checked' if setting.is_required %> style="width: 25px; height: 25px;">
-            </label>
-          </div>
-        <% end %>
+          <% end %>
 
-        <div style="margin-top: 25px;">
-          <%= f.submit "Save Form Changes", style: "background: #3498db; color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px;" %>
+          <div style="margin-top: 35px; text-align: left;">
+            <%= f.submit "Save Form Changes", 
+                style: "background: #3498db; color: white; border: none; padding: 14px 40px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);" %>
+          </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
+
   </div>
 </div>
+<% end %>

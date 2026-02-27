@@ -1,0 +1,15 @@
+<%= form_with model: [:admin, notice] do |f| %>
+  <div style="margin-bottom: 15px;">
+    <%= f.label :notice_type, "Notice Type", style: "display: block; font-weight: bold; margin-bottom: 5px;" %>
+    <%= f.select :notice_type, Notice.notice_types.keys.map { |k| [k.humanize, k] }, {}, 
+        style: "width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;" %>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <%= f.label :content, "Message", style: "display: block; font-weight: bold; margin-bottom: 5px;" %>
+    <%= f.text_area :content, placeholder: "Enter notice message here...", rows: 3, 
+        style: "width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;" %>
+  </div>
+
+  <%= f.submit "Post Notice", style: "background: #3498db; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-weight: bold;" %>
+<% end %>

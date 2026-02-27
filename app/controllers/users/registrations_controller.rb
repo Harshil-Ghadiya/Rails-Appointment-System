@@ -9,19 +9,16 @@ class Users::RegistrationsController < Devise::RegistrationsController
       name: params[:user][:name],
       email: params[:user][:email],
       phone_number: params[:user][:phone_number],
-      address: params[:user][:address],
       is_approved: false 
     )
 
     if @organization.save
-      default_password = params[:user][:phone_number]
       @user = User.new(
         name: params[:user][:admin_name],
         email: params[:user][:email],
-        password: default_password,
-        password_confirmation:default_password,
+        password: params[:user][:password],
+        password_confirmation: params[:user][:confirm_password],
         phone_number: params[:user][:phone_number],
-        address: params[:user][:address],
         organization_id: @organization.id 
       )
 

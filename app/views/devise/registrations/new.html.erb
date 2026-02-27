@@ -1,36 +1,67 @@
-<h2>self Sign up Organization </h2>
+<div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px 0;">
+  
+  <div style="width: 100%; max-width: 380px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #eee;">
+    
+    <div style="text-align: center; margin-bottom: 25px;">
+      <h2 style="color: #2c3e50; margin: 0; font-size: 20px; font-weight: 700;">Organization Self Sign Up</h2>
+      <p style="color: #7f8c8d; font-size: 12px; margin-top: 5px;">Register your organization to get started</p>
+    </div>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
 
+      <%# Organization Name %>
+      <div style="margin-bottom: 15px;">
+        <%= f.label :organization_name, style: "display: block; font-size: 12px; font-weight: 600; color: #34495e; margin-bottom: 5px;" %>
+        <%= f.text_field :name, autofocus: true, required: true, placeholder: "Hospital or Clinic Name",
+            style: "width: 100%; padding: 10px; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 13px;" %>
+      </div>
 
-<div class="field">
-  <p><%= f.label :organization_name %></p>
-  <p><%= f.text_field :name, autofocus: true, required: true %></p>
+      <%# Admin Name %>
+      <div style="margin-bottom: 15px;">
+        <%= label_tag "user[admin_name]", "Admin Full Name", style: "display: block; font-size: 12px; font-weight: 600; color: #34495e; margin-bottom: 5px;" %>
+        <%= text_field_tag "user[admin_name]", nil, required: true, placeholder: "Enter your full name",
+            style: "width: 100%; padding: 10px; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 13px;" %>
+      </div>
+
+      <%# Email %>
+      <div style="margin-bottom: 15px;">
+        <%= f.label :email, style: "display: block; font-size: 12px; font-weight: 600; color: #34495e; margin-bottom: 5px;" %>
+        <%= f.email_field :email, autocomplete: "email", required: true, placeholder: "admin@example.com",
+            style: "width: 100%; padding: 10px; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 13px;" %>
+      </div>
+
+      <%# Phone Number %>
+      <div style="margin-bottom: 15px;">
+        <%= f.label :phone_number, style: "display: block; font-size: 12px; font-weight: 600; color: #34495e; margin-bottom: 5px;" %>
+        <%= f.text_field :phone_number, required: true, placeholder: "e.g. 7383065396",
+            style: "width: 100%; padding: 10px; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 13px;" %>
+      </div>
+
+      <%# Password Grid - Side by side compact look %>
+      <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <div style="flex: 1;">
+          <%= f.label :password, style: "display: block; font-size: 11px; font-weight: 600; color: #34495e; margin-bottom: 5px;" %>
+          <%= f.password_field :password, required: true, placeholder: "Password",
+              style: "width: 100%; padding: 10px; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; font-size: 13px;" %>
+        </div>
+        <div style="flex: 1;">
+          <%= label_tag "user[confirm_password]", "Confirm", style: "display: block; font-size: 11px; font-weight: 600; color: #34495e; margin-bottom: 5px;" %>
+          <%= password_field_tag "user[confirm_password]", nil, required: true, placeholder: "Confirm",
+              style: "width: 100%; padding: 10px; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; font-size: 13px;" %>
+        </div>
+      </div>
+
+      <%# Submit Button %>
+      <div>
+        <%= f.submit "Register Organization", 
+            style: "width: 100%; background: #27ae60; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2); transition: 0.3s;" %>
+      </div>
+    <% end %>
+
+    <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #7f8c8d;">
+      <%= render "devise/shared/links" %>
+    </div>
+
   </div>
-
-<div class="field">
-    <p><%= label_tag "UserAdmin Name", "Admin Full Name" %></p>
-    <p><%= text_field_tag "user[admin_name]", nil, required: true %></p>
-  </div>
-<div class="field">
-  <p><%= f.label :email %></p>
-  <p><%= f.email_field :email,  autocomplete: "email", required: true %></p>
-  </div>
-
-<div class="field">
-  <p><%= f.label :phone_number %></p>
-  <p><%= f.text_field :phone_number, required: true %></p>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :address %></p>
-    <p><%= f.text_field :address %></p>
-  </div>
-
-  <div class="action">
-    <%= f.submit "Sign up Organization" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

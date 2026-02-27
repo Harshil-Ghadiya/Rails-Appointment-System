@@ -1,0 +1,8 @@
+<% flash.each do |type, message| %>
+  <div data-controller="toast" 
+       class="toast" 
+       style="background: <%= type == 'notice' ? '#28a745' : '#dc3545' %>; color: white; padding: 15px 25px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); min-width: 250px; display: flex; justify-content: space-between; align-items: center;">
+    <span><%= message %></span>
+    <button data-action="click->toast#close" style="background: none; border: none; color: white; cursor: pointer; font-weight: bold; margin-left: 10px;">&times;</button>
+  </div>
+<% end %>

@@ -1,83 +1,41 @@
-<div class="dashboard-wrapper" style="display: flex; min-height: 100vh; background: #f4f7f6; font-family: 'Segoe UI', Tahoma, sans-serif;">
-  
-  <%= render 'admin/shared/sidebar' %>
+<%# --- SECURITY: Stop Turbo from caching this page --- %>
+<%= turbo_frame_tag "main_content" do %>
+  <% content_for :head do %>
+    <meta name="turbo-cache-control" content="no-cache">
+  <% end %>
 
-  <div class="main-content" style="flex-grow: 1; margin-left: 250px; padding: 30px;">
+  <div class="dashboard-wrapper" style="background: #f4f7f6; font-family: 'Segoe UI', Tahoma, sans-serif; min-height: 100vh;">
     
-    <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-      <div>
-        <h4 style="margin: 0; color: #7f8c8d; font-size: 14px;">BOOKING CONTROL</h4>
-        <div style="margin-top: 10px;">
-          <%= button_to (@organization.is_booking_stopped ? "START BOOKING" : "STOP BOOKING"), 
-              admin_toggle_booking_path, method: :patch, 
-              style: "background: #{@organization.is_booking_stopped ? '#27ae60' : '#e74c3c'}; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;" %>
-        </div>
-      </div>
-
-      <div style="text-align: center; border-left: 1px solid #eee; padding-left: 40px; border-right: 1px solid #eee; padding-right: 40px;">
-        <h4 style="margin: 0; color: #7f8c8d; font-size: 14px;">DOCTOR AVAILABILITY</h4>
-        <h3 style="margin: 5px 0; color: #2980b9;"><%= @organization.doctor_status || "Available" %></h3>
-        <div style="display: flex; gap: 8px;">
-          <%= button_to "Available", admin_update_doctor_status_path(status: "Available"), method: :patch, style: "cursor:pointer; padding: 5px 10px; font-size: 12px; border-radius: 4px; border: 1px solid #ddd;" %>
-          <%= button_to "Busy", admin_update_doctor_status_path(status: "Busy"), method: :patch, style: "cursor:pointer; padding: 5px 10px; font-size: 12px; border-radius: 4px; border: 1px solid #ddd;" %>
-          <%= button_to "Away", admin_update_doctor_status_path(status: "Away"), method: :patch, style: "cursor:pointer; padding: 5px 10px; font-size: 12px; border-radius: 4px; border: 1px solid #ddd;" %>
-        </div>
-      </div>
-
-      <div style="text-align: right;">
-        <h2 style="margin: 0; color: #2c3e50; font-size: 22px;">Admin Dashboard</h2>
-        <p style="margin: 5px 0; color: #95a5a6;">Welcome back, <strong><%= current_user.name %></strong></p>
-      </div>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-top: 30px;">
+    <div class="main-content" style="padding: 30px; margin-left: 50px;  max-width: 1300px;">
       
-      <div class="qr-card" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); text-align: center; height: fit-content;">
-        <h4 style="margin-bottom: 15px; color: #34495e;">Patient QR Code</h4>
-        <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; display: inline-block; border: 1px solid #eee;">
-          <%= @svg.html_safe %>
+      <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px;">
+        
+        <div id="booking_status_area" style="flex: 1;">
+          <h4 style="margin: 0; color: #2a3839; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Booking Control</h4>
+          <div style="margin-top: 10px;">
+            <%= button_to (@organization.is_booking_stopped ? "START BOOKING" : "STOP BOOKING"), 
+                admin_toggle_booking_path, method: :patch, data: { turbo_frame: "main_content" },
+                style: "background: #{@organization.is_booking_stopped ? '#27ae60' : '#e74c3c'}; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" %>
+          </div>
         </div>
-        <p style="margin: 15px 0; font-size: 13px; color: #7f8c8d;">Scan to book appointments instantly.</p>
-        <div style="background: #e1f5fe; padding: 8px; border-radius: 5px; margin-bottom: 15px; word-break: break-all;">
-          <%= link_to @booking_url, @booking_url, target: "_blank", style: "color: #0277bd; font-weight: bold; font-size: 11px; text-decoration: none;" %>
+
+        
+        <div id="doctor_status_area" style="flex: 2; text-align: center; border-left: 1px solid #eee; border-right: 1px solid #eee; padding: 0 30px;">
+          <h4 style="margin: 0; color: #7f8c8d; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Doctor Status</h4>
+          <h3 style="margin: 8px 0; color: #2980b9; font-weight: 800; font-size: 22px;"><%= @organization.doctor_status || "Available" %></h3>
+          <div style="display: flex; gap: 8px; justify-content: center;">
+            <%= button_to "Available", admin_update_doctor_status_path(status: "Available"), method: :patch, data: { turbo_frame: "main_content" }, style: "cursor:pointer; padding: 6px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #27ae60; background: white; color: #27ae60; font-weight: bold;" %>
+            <%= button_to "Busy", admin_update_doctor_status_path(status: "Busy"), method: :patch, data: { turbo_frame: "main_content" }, style: "cursor:pointer; padding: 6px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #f39c12; background: white; color: #f39c12; font-weight: bold;" %>
+            <%= button_to "Away", admin_update_doctor_status_path(status: "Away"), method: :patch, data: { turbo_frame: "main_content" }, style: "cursor:pointer; padding: 6px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #e74c3c; background: white; color: #e74c3c; font-weight: bold;" %>
+          </div>
         </div>
-        <button onclick="window.print()" style="background: #3498db; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; width: 100%;">
-          🖨️ Print QR for Clinic
-        </button>
+        
+        <div style="flex: 1; text-align: right;">
+          <h2 style="margin: 0; color: #2c3e50; font-size: 20px;">Welcome Back!</h2>
+          <p style="margin: 5px 0; color: #3498db; font-weight: 600;"><%= current_user.name %></p>
+        </div>
       </div>
 
-      <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
-        <h4 style="margin-bottom: 20px; color: #34495e;">Live Appointment Queue</h4>
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-          <thead>
-            <tr style="border-bottom: 2px solid #f4f7f6; color: #95a5a6; font-size: 13px;">
-              <th style="padding: 10px;">TOKEN</th>
-              <th>PATIENT</th>
-              <th>STATUS</th>
-              <th style="text-align: right;">ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @appointments.each do |appt| %>
-              <tr style="border-bottom: 1px solid #f4f7f6;">
-                <td style="padding: 15px 10px; font-weight: bold; color: #2c3e50;"><%= appt.token_number %></td>
-                <td><%= appt.patient_name %></td>
-                <td>
-                  <span style="background: #e2e3e5; padding: 3px 8px; border-radius: 10px; font-size: 11px;"><%= appt.status.upcase %></span>
-                </td>
-                <td style="text-align: right;">
-                  <%= link_to "✅ Done", admin_update_appt_status_path(appt, status: 'completed'), method: :patch, style: "color: #27ae60; text-decoration: none; margin-left: 10px; font-size: 13px;" %>
-                  <%= link_to "⏭️ Skip", admin_update_appt_status_path(appt, status: 'skipped'), method: :patch, style: "color: #f39c12; text-decoration: none; margin-left: 10px; font-size: 13px;" %>
-                </td>
-              </tr>
-            <% end %>
-            <% if @appointments.empty? %>
-              <tr><td colspan="4" style="padding: 30px; text-align: center; color: #95a5a6;">No appointments for today.</td></tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
     </div>
-
   </div>
-</div>
+<% end %>

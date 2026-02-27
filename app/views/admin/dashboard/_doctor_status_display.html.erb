@@ -1,0 +1,9 @@
+<div id="doctor_status_area" style="flex: 2; text-align: center; border-left: 1px solid #eee; border-right: 1px solid #eee; padding: 0 30px;">
+  <h4 style="margin: 0; color: #7f8c8d; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Doctor Status</h4>
+  <h3 style="margin: 8px 0; color: #2980b9; font-weight: 800; font-size: 22px;"><%= @organization.doctor_status || "Available" %></h3>
+  <div style="display: flex; gap: 8px; justify-content: center;">
+    <%= button_to "Available", admin_update_doctor_status_path(status: "Available"), method: :patch, style: "cursor:pointer; padding: 6px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #27ae60; background: white; color: #27ae60; font-weight: bold;" %>
+    <%= button_to "Busy", admin_update_doctor_status_path(status: "Busy"), method: :patch, style: "cursor:pointer; padding: 6px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #f39c12; background: white; color: #f39c12; font-weight: bold;" %>
+    <%= button_to "Away", admin_update_doctor_status_path(status: "Away"), method: :patch, style: "cursor:pointer; padding: 6px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #e74c3c; background: white; color: #e74c3c; font-weight: bold;" %>
+  </div>
+</div>

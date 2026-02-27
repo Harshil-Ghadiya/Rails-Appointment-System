@@ -1,4 +1,7 @@
 class Admin::ProfilesController < ApplicationController
+    before_action :authenticate_user!
+      before_action :ensure_admin
+
   def edit; @user = current_user;
  end
 
@@ -11,5 +14,14 @@ class Admin::ProfilesController < ApplicationController
       render :edit
     end
   end
+
+  def ensure_admin
+    unless current_user.has_role?(:admin)
+      flash[:alert] = "Access Denied! You are not authorized."
+      redirect_to root_path
+    end
+  end
+  
+
 end
 

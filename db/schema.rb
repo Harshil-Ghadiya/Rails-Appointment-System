@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_20_045409) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_26_053817) do
   create_table "appointments", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "organization_id"
@@ -18,6 +18,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_20_045409) do
     t.string "patient_email"
     t.string "patient_name"
     t.string "patient_phone"
+    t.string "session_name"
     t.integer "status"
     t.string "token_number"
     t.integer "token_number_only"
@@ -29,6 +30,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_20_045409) do
     t.datetime "created_at", null: false
     t.string "day_name"
     t.time "end_time"
+    t.time "evening_end_time"
+    t.time "evening_start_time"
+    t.time "morning_end_time"
+    t.time "morning_start_time"
     t.integer "organization_id"
     t.time "start_time"
     t.string "token_prefix"
@@ -97,12 +102,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_20_045409) do
     t.string "last_sign_in_ip"
     t.string "name"
     t.integer "organization_id"
-    t.string "otp_code"
     t.string "password_digest"
     t.string "phone_number"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.string "role"
     t.integer "sign_in_count", default: 0, null: false
     t.string "unconfirmed_email"
     t.datetime "updated_at", null: false

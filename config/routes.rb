@@ -12,19 +12,24 @@ devise_for :users, controllers: {
     get 'dashboard', to: 'dashboard#index' 
     patch 'approve/:id', to: 'dashboard#approve', as: 'approve_organization'
     patch 'inactive/:id', to: 'dashboard#inactive', as: 'inactive_organization'
+
+    post 'login_as_admin/:id', to: 'dashboard#login_as_admin', as: 'login_as_admin'
   end
+
+  get 'patient_info/:id', to: 'patient_portal#show_info', as: :patient_info
+
 namespace :admin do
     # Req 1, 2, 5: Dashboard & Status Controls
     get 'dashboard', to: 'dashboard#index'
+    get 'generate_qr', to: 'dashboard#generate_qr' # Aa line umero
     patch 'toggle_booking', to: 'dashboard#toggle_booking'
     patch 'update_doctor_status', to: 'dashboard#update_doctor_status'
-    patch 'appointments/:id/update_status', to: 'dashboard#update_status', as: :update_appt_status
-    
-    # Req 3: Booking Time & Prefix
+    patch 'appointments/:id/update_status/:status', to: 'dashboard#update_status', as: :update_appt_status    # Req 3: Booking Time & Prefix
     resources :booking_controls, only: [:index, :update]
-    
+resources :appointments, only: [:index]
     # Req 4: Reserved Tokens
-resources :reserved_tokens, only: [:index, :create, :destroy]    
+  resources :reserved_tokens, only: [:index, :create, :destroy] 
+   
     # Req 7: Field Settings (Mandatory/Optional Fields)
     resources :field_settings, only: [:index] do
       collection { patch :update_all }

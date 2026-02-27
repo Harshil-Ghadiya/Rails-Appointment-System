@@ -1,0 +1,8 @@
+<div id="booking_status_area" style="flex: 1;">
+  <h4 style="margin: 0; color: #2a3839; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Booking Control</h4>
+  <div style="margin-top: 10px;">
+    <%= button_to (@organization.is_booking_stopped ? "START BOOKING" : "STOP BOOKING"), 
+        admin_toggle_booking_path, method: :patch,
+        style: "background: #{@organization.is_booking_stopped ? '#27ae60' : '#e74c3c'}; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" %>
+  </div>
+</div>

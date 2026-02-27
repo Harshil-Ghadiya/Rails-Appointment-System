@@ -1,42 +1,56 @@
-<%# Req 1, 2, 5: Live Updates using Turbo Streams %>
-<%= turbo_stream_from "organization_#{@organization.id}_updates" %>
+<%= turbo_frame_tag "main_content" do %>
+          <%= render 'admin/shared/sidebar' %>
 
-<div style="text-align: center; padding: 50px; font-family: sans-serif;">
-  <div style="display: inline-block; background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); min-width: 320px;">
-    <h3 style="color: #95a5a6; margin: 0;">YOUR TOKEN</h3>
+<div style="max-width: 500px; margin: 40px auto; font-family: 'Segoe UI', sans-serif; padding: 20px; text-align: center;">
+  <div style="background: white; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; border: 2px solid #2980b9;">
     
-    <h1 style="font-size: 80px; margin: 15px 0; color: #2ecc71;">
-      <%# AA SUDHARO: Aaje je divas che eno prefix sodho %>
-      <% today_prefix = @organization.booking_controls.find_by(day_name: Time.now.strftime("%A"))&.token_prefix || "TK" %>
-      <%= today_prefix %>-<%= @appointment.token_number %>
-    </h1>
+    <%# Success Header %>
+    <div style="background: #2980b9; color: white; padding: 20px;">
+      <h3 style="margin: 0;">APPOINTMENT CONFIRMED</h3>
+    </div>
 
-    <p style="font-size: 18px; color: #34495e;">Hello, <strong><%= @appointment.patient_name %></strong></p>
+    <div style="padding: 30px;">
+      <p style="color: #7f8c8d; margin-bottom: 5px;"><%= @organization.name %></p>
+      <h4 style="margin: 0; color: #2c3e50;"><%= @appointment.patient_name %></h4>
 
-    <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
-      
-      <div id="status_section">
-        <div style="margin-bottom: 15px;">
-          <small>Doctor Availability:</small><br>
-          <strong style="color: <%= @organization.is_approved ? '#2ecc71' : '#e74c3c' %>;">
-            ● <%= @organization.is_approved ? "In Clinic" : "Not Available" %>
-          </strong>
+      <%# YOUR TOKEN BIG BOX %>
+      <div style="margin: 25px 0; padding: 20px; background: #f8f9fa; border: 2px dashed #2980b9; border-radius: 15px;">
+        <small style="color: #2980b9; font-weight: bold;">YOUR TOKEN NUMBER</small>
+        <h1 style="font-size: 60px; margin: 10px 0; color: #2c3e50;"><%= @appointment.token_number %></h1>
+      </div>
+
+      <%# LIVE STATS GRID %>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 12px;">
+          <small style="color: #1565c0; font-weight: bold;">CURRENT TOKEN</small>
+          <div style="font-size: 22px; font-weight: bold; color: #0d47a1;">T-<%= @current_serving %></div>
         </div>
-
-        <div style="display: flex; justify-content: space-around;">
-          <div>
-            <small>Now Serving</small><br>
-            <strong style="font-size: 24px; color: #e67e22;">#<%= @current_serving %></strong>
-          </div>
-          <div>
-            <small>Queue End</small><br>
-            <strong style="font-size: 24px; color: #7f8c8d;">#<%= @last_token %></strong>
-          </div>
+        <div style="background: #f1f8e9; padding: 15px; border-radius: 12px;">
+          <small style="color: #2e7d32; font-weight: bold;">LAST TOKEN</small>
+          <div style="font-size: 22px; font-weight: bold; color: #1b5e20;">T-<%= @last_token %></div>
         </div>
       </div>
 
+   <div style="text-align: center; margin-bottom: 30px; padding: 15px; border-radius: 12px; background: #fff3e0;">
+         <span style="color: #e65100; font-weight: bold;">👨‍⚕️ DOCTOR STATUS: </span>
+         <span style="background: #ff9800; color: white; padding: 4px 12px; border-radius: 20px; font-size: 14px;">
+           <%= @organization.doctor_status || "Available" %>
+         </span>
+      </div>
+
+
+
+      <%# QR CODE (Optional - depends on your setup) %>
+      <div style="margin-bottom: 20px;">
+        <p style="font-size: 12px; color: #95a5a6;">Scan or Take a Screenshot of this Token</p>
+      </div>
+
+      <%= link_to "GO BACK", root_path, style: "text-decoration: none; color: #3498db; font-weight: bold; font-size: 14px;" %>
     </div>
-    
-    <p style="margin-top: 20px; font-size: 12px; color: #bdc3c7;">Status updates automatically. No need to refresh.</p>
   </div>
+  
+  <p style="margin-top: 20px; color: #95a5a6; font-size: 12px;">
+    Please arrive 10 minutes before your estimated turn.
+  </p>
 </div>
+<% end %>

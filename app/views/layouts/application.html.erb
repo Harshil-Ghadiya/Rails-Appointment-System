@@ -1,48 +1,50 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="turbo-cache-control" content="no-cache">
     <title><%= content_for(:title) || "Myapp" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Myapp">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <%= javascript_importmap_tags %>
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body style="margin: 0; background: #f4f7f6;">
+    
+    <%# --- GLOBAL FLASH CONTAINER: Aa hamesha ahiya rahese --- %>
+    <div id="flash-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+      <%= render 'layouts/flash' %>
+    </div>
 
-    <% if flash.any? %>
-  <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
-    <% flash.each do |type, message| %>
-      <% color = (type == 'notice' ? '#28a745' : '#dc3545') %>
-      <div class="toast" style="background: <%= color %>; color: white; padding: 15px 25px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-width: 250px;">
-        <%= message %>
-      </div>
-    <% end %>
-  </div>
+    <div class="app-container" style="display: flex; min-height: 100vh;">
+      
+      <% if current_user && request.path.include?('/admin') %>
+        
+        <div style="width: 250px; flex-shrink: 0;">
+          <%= render 'admin/shared/sidebar' %>
+        </div>
 
-  <script>
-    // 5 second pachi toast gayab thai jase
-    setTimeout(() => {
-      const toasts = document.querySelectorAll('.toast');
-      toasts.forEach(t => t.style.display = 'none');
-    }, 5000);
-  </script>
-<% end %>
+        <main style="flex-grow: 1;">
+          <%= turbo_frame_tag "main_content", data: { turbo_action: "advance" } do %>
+            <%= yield %>
+          <% end %>
+        </main>
+
+      <% else %>
+        
+        <main style="flex-grow: 1; width: 100%;">
+          <%= yield %>
+        </main>
+
+      <% end %>
+
+    </div>
   </body>
 </html>
-

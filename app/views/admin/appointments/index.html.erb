@@ -1,0 +1,45 @@
+<%= turbo_frame_tag "main_content" do %>
+<div class="dashboard-wrapper" style="display: flex; min-height: 100vh; background: #f4f7f6; font-family: 'Segoe UI', Tahoma, sans-serif;">
+  
+  <div class="main-content" style="flex-grow: 1; margin-left: 50px; padding: 40px; box-sizing: border-box;">
+    
+    <div style="margin-bottom: 35px; border-bottom: 1px solid #e0e0e0; padding-bottom: 15px;">
+      <h2 style="margin: 0; color: #2c3e50; font-size: 26px;">Appointment Management</h2>
+      <p style="color: #95a5a6; margin-top: 5px;">Manage live patient queues and statuses for today.</p>
+    </div>
+
+    <%= turbo_stream_from "admin_dashboard_#{@organization.id}" %>
+
+    <%# --- Reusable Section Template --- %>
+    <% [
+      { id: "pending", title: "Pending Appointment", color: "#3498db", icon: "🕒" },
+      { id: "completed", title: "Completed Appointments", color: "#27ae60", icon: "✅" },
+      { id: "skipped", title: "Skipped Appointments", color: "#f39c12", icon: "⏭️" },
+      { id: "deleted", title: "Deleted Appointments", color: "#e74c3c", icon: "🗑️" }
+    ].each do |section| %>
+      
+      <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 30px;">
+        <h4 style="margin-bottom: 20px; color: <%= section[:color] %>; border-left: 4px solid <%= section[:color] %>; padding-left: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+          <span><%= section[:icon] %></span> <%= section[:title] %>
+        </h4>
+
+        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+          <thead>
+            <tr style="border-bottom: 2px solid #f4f7f6; color: #95a5a6; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">
+              <th style="padding: 12px 10px; width: 15%; text-align: left;">TOKEN</th>
+              <th style="padding: 12px 10px; width: 45%; text-align: left;">PATIENT</th>
+              <th style="padding: 12px 10px; width: 15%; text-align: center;">STATUS</th>
+              <th style="padding: 12px 10px; width: 25%; text-align: right;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="<%= section[:id] %>_appointments">
+            <% @appointments.where(status: section[:id]).each do |appt| %>
+              <%= render 'admin/dashboard/appointment_row', appt: appt %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </div>
+</div>
+<% end %>

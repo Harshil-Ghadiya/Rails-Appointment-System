@@ -18,7 +18,21 @@ def approve
     redirect_to superadmin_dashboard_path, alert: "Organization Deactivated!"
   end
 
-  
+
+
+def login_as_admin
+  @organization = Organization.find(params[:id])
+  @admin_user = @organization.users.find_by(role: 'admin') # Jo tamare role-based logic hoy to
+
+  if @admin_user
+    sign_in(:user, @admin_user)
+    redirect_to admin_dashboard_path, notice: "Logged in as Admin for #{@organization.name}"
+  else
+    redirect_to superadmin_dashboard_path, alert: "Admin user not found for this organization."
+  end
+end  
+
+
 private
 
   def ensure_super_admin

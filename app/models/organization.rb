@@ -8,5 +8,4 @@ class Organization < ApplicationRecord
   validates :name, presence: true
   validates :email, presence: true, uniqueness: {message: "is alreay taken by another organization"} 
   validates :phone_number, presence: true, uniqueness: {message: "is already taken by another organization"}
-  validates :address, presence: true
 end

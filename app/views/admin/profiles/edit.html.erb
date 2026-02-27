@@ -1,11 +1,12 @@
+<%= turbo_frame_tag "main_content" do %>
 <div style="display: flex;">
-  <%= render 'admin/shared/sidebar' %>
-  <div style="margin-left: 270px; padding: 20px; flex: 1;">
+  <div style="margin-left: 50px; padding: 20px; flex: 1;">
     <h2>Change Password (Requirement 6)</h2>
-    <%= form_with model: @user, url: admin_profile_path, method: :patch, local: true do |f| %>
+    <%= form_with model: @user, url: admin_profile_path, method: :patch,  data: { turbo_frame: "main_content" } do |f| %>
       <%= f.label :new_password %><br><%= f.password_field :password %><br>
       <%= f.label :confirm_password %><br><%= f.password_field :password_confirmation %><br>
       <%= f.submit "Update Password" %>
     <% end %>
   </div>
 </div>
+<% end %>

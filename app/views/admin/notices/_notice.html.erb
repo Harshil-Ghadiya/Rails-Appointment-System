@@ -1,0 +1,14 @@
+<div id="<%= dom_id(notice) %>" style="background: white; padding: 15px; border-radius: 8px; border-left: 5px solid <%= notice.general? ? '#3498db' : '#f1c40f' %>; display: flex; justify-content: space-between; align-items: center;">
+  <div>
+    <span style="font-size: 12px; text-transform: uppercase; font-weight: bold; color: #7f8c8d;">
+      <%= notice.notice_type.humanize %>
+    </span>
+    <p style="margin: 5px 0; font-size: 16px; color: #2c3e50;"><%= notice.content %></p>
+  </div>
+  
+  <%= button_to admin_notice_path(notice), method: :delete, 
+      data: { turbo_confirm: "Delete this notice?" }, 
+      style: "background: #ff7675; color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer;" do %>
+    Delete
+  <% end %>
+</div>
