@@ -49,7 +49,7 @@ def toggle_booking
     end
   end
 
-  # --- DOCTOR STATUS (Available/Away) ---
+  # DOCTOR STATUS 
   def update_doctor_status 
     @organization = current_user.organization
     @organization.update(doctor_status: params[:status])
@@ -69,16 +69,31 @@ def toggle_booking
 
 
 def update_status
-    @appointment = current_user.organization.appointments.find(params[:id])
-    if @appointment.update(status: params[:status])
-      respond_to do |format|
-        format.turbo_stream
-        format.html { redirect_to admin_dashboard_path, notice: "Status updated!" }
+  @appointment = current_user.organization.appointments.find(params[:id])
+  
+  if @appointment.update(status: params[:status])
+
+    flash.now[:notice] = "Token #{@appointment.token_number} moved to #{params[:status].capitalize}!"
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.prepend("flash-container", partial: "layouts/flash"),
+          
+          turbo_stream.remove("appt_row_#{@appointment.id}"),
+          
+          turbo_stream.append("#{params[:status]}_appointments", 
+                               partial: "admin/dashboard/appointment_row", 
+                               locals: { appt: @appointment })
+        ]
       end
-    else
-      redirect_to admin_dashboard_path, alert: "Failed to update status."
+      format.html { redirect_to admin_dashboard_path, notice: "Status updated!" }
     end
+  else
+    redirect_to admin_dashboard_path, alert: "Failed to update status."
   end
+end
+
 
 
   private 

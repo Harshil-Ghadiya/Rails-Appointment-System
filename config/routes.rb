@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-devise_for :users, controllers: {
+  devise_for :users, controllers: {
     registrations: 'users/registrations',
     sessions: 'users/sessions'
   }  
@@ -7,57 +7,48 @@ devise_for :users, controllers: {
   get 'verify_otp', to: 'otp_verifications#new'
   post 'verify_otp', to: 'otp_verifications#create'
 
-
   namespace :superadmin do 
     get 'dashboard', to: 'dashboard#index' 
     patch 'approve/:id', to: 'dashboard#approve', as: 'approve_organization'
     patch 'inactive/:id', to: 'dashboard#inactive', as: 'inactive_organization'
-
     post 'login_as_admin/:id', to: 'dashboard#login_as_admin', as: 'login_as_admin'
   end
 
   get 'patient_info/:id', to: 'patient_portal#show_info', as: :patient_info
 
-namespace :admin do
-    # Req 1, 2, 5: Dashboard & Status Controls
+  namespace :admin do
+    # Dashboard & Status Controls
     get 'dashboard', to: 'dashboard#index'
-    get 'generate_qr', to: 'dashboard#generate_qr' # Aa line umero
+    get 'generate_qr', to: 'dashboard#generate_qr'
+    
     patch 'toggle_booking', to: 'dashboard#toggle_booking'
     patch 'update_doctor_status', to: 'dashboard#update_doctor_status'
-    patch 'appointments/:id/update_status/:status', to: 'dashboard#update_status', as: :update_appt_status    # Req 3: Booking Time & Prefix
+
+    
+    # Ahiya line alag karvi pade:
+patch 'dashboard/:id/update_status/:status', to: 'dashboard#update_status', as: :update_appt_status    
     resources :booking_controls, only: [:index, :update]
-resources :appointments, only: [:index]
-    # Req 4: Reserved Tokens
-  resources :reserved_tokens, only: [:index, :create, :destroy] 
-   
-    # Req 7: Field Settings (Mandatory/Optional Fields)
+    resources :appointments, only: [:index]
+    
+    # Reserved Tokens
+    resources :reserved_tokens, only: [:index, :create, :destroy] 
+    
+    # Field Settings
     resources :field_settings, only: [:index] do
       collection { patch :update_all }
     end
     
-    # Req 8: Notices for Patients
+    # Notices
     resources :notices, only: [:index, :create, :destroy]
     
-    # Req 6: Admin Profile (Edit Password)
+    # Profile
     resource :profile, only: [:edit, :update]
   end
 
-  # --- Patient Side Routes ---
-  # Aa routes patients mate che jo QR scan karshe tyare vaprashe
+  # Patient Side
   resources :appointments, only: [:new, :create, :show]
 
-
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
   
-root 'admin/dashboard#index'
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
-  # root "posts#index"
+root to: redirect('/admin/dashboard')
 end

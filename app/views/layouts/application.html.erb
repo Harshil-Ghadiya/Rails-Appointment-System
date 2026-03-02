@@ -8,30 +8,27 @@
     <%= csp_meta_tag %>
     <%= yield :head %>
     <%= javascript_importmap_tags %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   </head>
 
   <body style="margin: 0; background: #f4f7f6;">
     
-    <%# --- GLOBAL FLASH CONTAINER: Aa hamesha ahiya rahese --- %>
+    <%# Flash container hamesha top par %>
     <div id="flash-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
       <%= render 'layouts/flash' %>
     </div>
 
     <div class="app-container" style="display: flex; min-height: 100vh;">
       
-      <% if current_user && request.path.include?('/admin') %>
+      <%# Admin Layout %>
+      <% if current_user && (request.path.include?('/admin') || request.path.include?('/patient_info')) %>
         
         <div style="width: 250px; flex-shrink: 0;">
           <%= render 'admin/shared/sidebar' %>
         </div>
 
         <main style="flex-grow: 1;">
+          <%# data-turbo-action="advance" URL update karse %>
           <%= turbo_frame_tag "main_content", data: { turbo_action: "advance" } do %>
             <%= yield %>
           <% end %>
@@ -39,6 +36,7 @@
 
       <% else %>
         
+        <%# Public Layout (Booking Form, etc.) %>
         <main style="flex-grow: 1; width: 100%;">
           <%= yield %>
         </main>

@@ -1,11 +1,25 @@
 <%= turbo_frame_tag "main_content" do %>
-<div style="display: flex;">
-  <div style="margin-left: 50px; padding: 20px; flex: 1;">
-    <h2>Change Password (Requirement 6)</h2>
-    <%= form_with model: @user, url: admin_profile_path, method: :patch,  data: { turbo_frame: "main_content" } do |f| %>
-      <%= f.label :new_password %><br><%= f.password_field :password %><br>
-      <%= f.label :confirm_password %><br><%= f.password_field :password_confirmation %><br>
-      <%= f.submit "Update Password" %>
+<div style="display: flex; justify-content: center; align-items: flex-start; padding-top: 50px; background: #f8f9fa; min-height: 80vh;">
+  <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px;">
+    <h2 style="color: #2c3e50; margin-bottom: 25px; text-align: center;">🔒 Change Password</h2>
+    
+    <%= form_with model: @user, url: admin_profile_path, method: :patch, data: { turbo: true, turbo_frame: "_top" } do |f| %>
+      
+      <div style="margin-bottom: 20px;">
+        <%= f.label :password, "New Password", style: "display: block; font-weight: bold; margin-bottom: 8px; color: #34495e;" %>
+        <%= f.password_field :password, placeholder: "new-Password", style: "width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;" %>
+      </div>
+
+      <div style="margin-bottom: 25px;">
+        <%= f.label :password_confirmation, "Confirm New Password", style: "display: block; font-weight: bold; margin-bottom: 8px; color: #34495e;" %>
+        <%= f.password_field :password_confirmation, placeholder: "confirm-password", style: "width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;" %>
+      </div>
+
+      <%= f.submit "Update Password", style: "width: 100%; background: #3498db; color: white; border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.3s;" %>
+      
+      <div style="text-align: center; margin-top: 15px;">
+        <%= link_to "Cancel", admin_dashboard_path, style: "color: #95a5a6; text-decoration: none; font-size: 14px;" %>
+      </div>
     <% end %>
   </div>
 </div>

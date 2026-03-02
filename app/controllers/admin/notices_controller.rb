@@ -24,6 +24,16 @@ class Admin::NoticesController < ApplicationController
         end
         format.html { redirect_to admin_notices_path }
       else
+
+
+        flash.now[:alert] = @notice.errors.full_messages.to_sentence
+        
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.prepend("flash-container", partial: "layouts/flash")
+        end
+        
+        format.html { render :index, status: :unprocessable_entity }
+        
       end
     end
   end

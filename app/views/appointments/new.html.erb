@@ -5,7 +5,7 @@
       
  <%# Notice Before a Book Appointment  %>
 
-      <% if @notices.any? %>
+      <% if @notices&.any? %>
   <div class="notices-container" style="margin-bottom: 25px;">
     <% @notices.each do |notice| %>
       <div style="background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">

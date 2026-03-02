@@ -26,7 +26,9 @@ def update
       format.turbo_stream do
         render turbo_stream: [
           turbo_stream.prepend("flash-container", partial: "layouts/flash"),
-          turbo_stream.replace("booking_row_#{@control.id}", partial: "admin/booking_controls/booking_row", locals: { control: @control })
+          turbo_stream.replace("booking_row_#{@control.id}", 
+          partial: "admin/booking_controls/booking_row",
+           locals: { control: @control })
         ]
       end
       format.html { redirect_to admin_booking_controls_path, notice: flash.now[:notice] }
@@ -34,9 +36,8 @@ def update
   end
 end
 
-
-
-      def ensure_admin
+ 
+  def ensure_admin
     unless current_user.has_role?(:admin)
       flash[:alert] = "Access Denied! You are not authorized."
       redirect_to root_path

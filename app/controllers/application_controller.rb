@@ -23,7 +23,6 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # Aa method browser ne dashboard cache karvathi rokshe
   def set_no_cache
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
     response.headers["Pragma"] = "no-cache"

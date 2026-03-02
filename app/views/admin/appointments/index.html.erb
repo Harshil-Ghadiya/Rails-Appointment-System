@@ -10,7 +10,6 @@
 
     <%= turbo_stream_from "admin_dashboard_#{@organization.id}" %>
 
-    <%# --- Reusable Section Template --- %>
     <% [
       { id: "pending", title: "Pending Appointment", color: "#3498db", icon: "🕒" },
       { id: "completed", title: "Completed Appointments", color: "#27ae60", icon: "✅" },
@@ -32,9 +31,20 @@
               <th style="padding: 12px 10px; width: 25%; text-align: right;">ACTIONS</th>
             </tr>
           </thead>
+          <%# --- TBODY ID MUST MATCH WITH CONTROLLER APPEND --- %>
           <tbody id="<%= section[:id] %>_appointments">
-            <% @appointments.where(status: section[:id]).each do |appt| %>
-              <%= render 'admin/dashboard/appointment_row', appt: appt %>
+            <% section_appts = @appointments.where(status: section[:id]) %>
+            <% if section_appts.any? %>
+              <% section_appts.each do |appt| %>
+                <%= render 'admin/dashboard/appointment_row', appt: appt %>
+              <% end %>
+            <% else %>
+              <%# --- ID matching for Turbo Stream Remove --- %>
+              <tr id="<%= section[:id] %>_empty_row">
+                <td colspan="4" style="text-align: center; padding: 25px; color: #bdc3c7; font-size: 14px;">
+                  No <%= section[:title].downcase %> recorded yet.
+                </td>
+              </tr>
             <% end %>
           </tbody>
         </table>

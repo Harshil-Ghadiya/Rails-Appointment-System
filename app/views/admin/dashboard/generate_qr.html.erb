@@ -34,7 +34,6 @@
         <%# Section 3: Booking URL %>
        <div style="background: #f1f9ff; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #d1e9ff;">
   <small style="display: block; color: #0277bd; font-weight: bold; margin-bottom: 8px;">PATIENT PREVIEW LINK:</small>
-  <%# Ahiya apde direct booking link badli ne 'info' vali link muki didhi %>
   <% info_url = patient_info_url(id: @organization.id) %> 
   <%= link_to info_url, info_url, style: "color: #0277bd; font-size: 13px; text-decoration: underline; word-break: break-all; font-weight: 500;" %>
   

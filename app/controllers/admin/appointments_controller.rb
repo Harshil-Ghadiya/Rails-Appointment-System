@@ -4,15 +4,12 @@ class Admin::AppointmentsController < ApplicationController
 
   def index
     @organization = current_user.organization
-    
-    # 1. Get current day control to find your SET timing
-    day_name = Time.zone.now.strftime("%A")
+    current_time = Time.zone.now
+    day_name = current_time.strftime("%A")
     @booking_control = @organization.booking_controls.find_by(day_name: day_name)
 
     if @booking_control.present?
-      current_time_str = Time.zone.now.strftime("%H:%M")
-      
-      # 2. Dynamic Session Logic: Tame set karela Evening start time mujab switch thase
+      current_time_str = current_time.strftime("%H:%M")
       evening_start = @booking_control.evening_start_time.strftime("%H:%M")
       
       if current_time_str < evening_start
@@ -21,9 +18,8 @@ class Admin::AppointmentsController < ApplicationController
         @current_session = "Evening"
       end
 
-      # 3. Filter Appointments: Khali AAJNA ane CURRENT SESSION na j tokens
       @appointments = @organization.appointments
-                                   .where(created_at: Time.zone.now.all_day)
+                                   .where(created_at: current_time.all_day)
                                    .where(session_name: @current_session)
                                    .order(:token_number_only)
     else
@@ -32,8 +28,11 @@ class Admin::AppointmentsController < ApplicationController
 
     respond_to do |format|
       format.html
-      # Jo tame automatic refresh (Turbo Stream) use karta hov to aa kaam lagshe
-      format.turbo_stream { render turbo_stream: turbo_stream.replace("appointments_list", partial: "admin/appointments/table") }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("appointments_list", 
+               partial: "admin/appointments/table", 
+               locals: { appointments: @appointments })
+      end
     end
   end
 
