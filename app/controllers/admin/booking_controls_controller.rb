@@ -17,18 +17,18 @@ class Admin::BookingControlsController < ApplicationController
 
 def update
   @control = current_user.organization.booking_controls.find(params[:id])
+  @booking_controls = current_user.organization.booking_controls # Index mate badha controls fari thi joise
   
   if @control.update(params.require(:booking_control).permit(:token_prefix, :morning_start_time, :morning_end_time, :evening_start_time, :evening_end_time))
-    
     flash.now[:notice] = "Booking time for #{@control.day_name} updated!"
 
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: [
           turbo_stream.prepend("flash-container", partial: "layouts/flash"),
-          turbo_stream.replace("booking_row_#{@control.id}", 
-          partial: "admin/booking_controls/booking_row",
-           locals: { control: @control })
+          turbo_stream.replace("booking_schedule_container", 
+                               partial: "admin/booking_controls/schedule_table", 
+                               locals: { booking_controls: @booking_controls })
         ]
       end
       format.html { redirect_to admin_booking_controls_path, notice: flash.now[:notice] }
@@ -36,7 +36,8 @@ def update
   end
 end
 
- 
+
+
   def ensure_admin
     unless current_user.has_role?(:admin)
       flash[:alert] = "Access Denied! You are not authorized."

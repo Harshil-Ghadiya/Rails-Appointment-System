@@ -1,20 +1,32 @@
-<%# app/views/admin/booking_controls/_booking_row.html.erb %>
-<tbody id="booking_row_<%= control.id %>">
-  <%= form_with model: [:admin, control], format: :turbo_stream do |f| %>
-    <tr style="border-bottom: 1px solid #f1f1f1;">
-      <td style="padding: 15px;"><strong><%= control.day_name %></strong></td>
-      <td><%= f.text_field :token_prefix, style: "width: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %></td>
-      <td>
-        <%= f.time_field :morning_start_time, value: control.morning_start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %> -
+<tr id="booking_row_<%= control.id %>" style="border-bottom: 1px solid #f1f1f1;">
+  <%= form_with model: [:admin, control], data: { turbo: true }, html: { style: "display: contents;" } do |f| %>
+    
+    <td style="padding: 15px; vertical-align: middle;">
+      <strong><%= control.day_name %></strong>
+    </td>
+
+    <td style="padding: 15px; vertical-align: middle;">
+      <%= f.text_field :token_prefix, style: "width: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" %>
+    </td>
+
+    <td style="padding: 15px; vertical-align: middle;">
+      <div style="display: flex; align-items: center; gap: 5px;">
+        <%= f.time_field :morning_start_time, value: control.morning_start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
+        <span style="color: #999;">-</span>
         <%= f.time_field :morning_end_time, value: control.morning_end_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
-      </td>
-      <td>
-        <%= f.time_field :evening_start_time, value: control.evening_start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %> -
+      </div>
+    </td>
+
+    <td style="padding: 15px; vertical-align: middle;">
+      <div style="display: flex; align-items: center; gap: 5px;">
+        <%= f.time_field :evening_start_time, value: control.evening_start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
+        <span style="color: #999;">-</span>
         <%= f.time_field :evening_end_time, value: control.evening_end_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 4px;" %>
-      </td>
-      <td>
-        <%= f.submit "Update", style: "background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;" %>
-      </td>
-    </tr>
+      </div>
+    </td>
+
+    <td style="padding: 15px; vertical-align: middle; text-align: center;">
+      <%= f.submit "Update", style: "background: #27ae60; color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; font-weight: bold;" %>
+    </td>
   <% end %>
-</tbody>
+</tr>

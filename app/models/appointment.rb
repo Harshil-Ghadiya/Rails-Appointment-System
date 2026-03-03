@@ -67,7 +67,7 @@ def broadcast_to_tv
   
   broadcast_replace_to "tv_channel_#{organization_id}", 
                          target: "tv_token_list",
-                         partial: "admin/tv_screens/queue_list", 
+                         partial: "tv_screens/queue_list", 
                          locals: { organization: organization }
 end
 end

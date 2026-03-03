@@ -11,13 +11,8 @@
       <li style="margin-bottom: 15px;"><%= link_to " Manage Appointments", admin_appointments_path, style: "color: white; text-decoration: none; display: block; padding: 8px;", data: { turbo_frame: "main_content" } %> </li>
       <li style="margin-bottom: 15px;"><%= link_to "🔒 Change Password", edit_admin_profile_path, style: "color: white; text-decoration: none; display: block; padding: 8px;", data: { turbo_frame: "main_content" }  %> </li>
 
-      <li style="margin-top: 20px; border-top: 1px solid #455a64; padding-top: 15px;">
-  <%= link_to admin_tv_screen_path(current_user.organization.id), 
-              style: "background: #27ae60; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 8px; font-weight: bold; transition: 0.3s;" do %>
-    <span style="margin-right: 10px;">📺</span> Open TV Screen
-  <% end %>
-</li>
-
+   
+<br><br>
       <li style="margin-bottom: 15px;"><%= link_to "📲 click And Get Token", admin_generate_qr_path, style: "color: #f1c40f; text-decoration: none; display: block; padding: 10px; border: 1px dashed #f1c40f; border-radius: 6px; text-align: center; font-weight: bold;",data: { turbo_frame: "main_content"} %>
     </li>
     </ul>

@@ -45,7 +45,10 @@
         <p style="font-size: 12px; color: #95a5a6;">Scan or Take a Screenshot of this Token</p>
       </div>
 
-      <%= link_to "GO BACK", root_path, style: "text-decoration: none; color: #3498db; font-weight: bold; font-size: 14px;" %>
+      <%= link_to "GO BACK", admin_dashboard_path,
+data: { turbo_frame: "_top" },
+style: "text-decoration: none; color: #3498db; font-weight: bold; font-size: 14px;"
+       %>
     </div>
   </div>
   

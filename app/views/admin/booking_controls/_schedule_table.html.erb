@@ -1,0 +1,52 @@
+<%# app/views/admin/booking_controls/_schedule_table.html.erb %>
+<div id="booking_schedule_container">
+  <div style="background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #eee;">
+    
+    <%# Header Section %>
+    <div style="display: flex; background: #f8f9fa; border-bottom: 2px solid #eee; font-weight: bold; padding: 15px 0;">
+      <div style="flex: 0 0 12%; padding-left: 20px;">Day</div>
+      <div style="flex: 0 0 10%; padding-left: 10px;">Prefix</div>
+      <div style="flex: 0 0 30%; padding-left: 10px; color: #181a1c;">Morning (Start - End)</div>
+      <div style="flex: 0 0 30%; padding-left: 10px; color: #e67e22;">Evening (Start - End)</div>
+      <div style="flex: 0 0 9%; text-align: center;">Action</div>
+    </div>
+
+    <%# Body Section %>
+    <div id="booking_rows">
+      <% booking_controls.each do |control| %>
+        <%= form_with model: [:admin, control], data: { turbo: true }, html: { style: "display: flex; align-items: center; border-bottom: 1px solid #f1f1f1; padding: 12px 0; width: 100%; box-sizing: border-box;" } do |f| %>
+          
+          <%# 1. Day - 12% %>
+          <div style="flex: 0 0 12%; padding-left: 20px; box-sizing: border-box;">
+            <strong style="color: #2c3e50;"><%= control.day_name %></strong>
+          </div>
+
+          <%# 2. Prefix - 10% %>
+          <div style="flex: 0 0 10%; padding-left: 10px; box-sizing: border-box;">
+            <%= f.text_field :token_prefix, style: "width: 45px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center;" %>
+          </div>
+
+          <%# 3. Morning - 30% %>
+          <div style="flex: 0 0 30%; padding-left: 10px; display: flex; align-items: center; gap: 5px; box-sizing: border-box;">
+            <%= f.time_field :morning_start_time, value: control.morning_start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 95px;" %>
+            <span style="color: #bbb;">-</span>
+            <%= f.time_field :morning_end_time, value: control.morning_end_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 95px;" %>
+          </div>
+
+          <%# 4. Evening - 30% %>
+          <div style="flex: 0 0 30%; padding-left: 10px; display: flex; align-items: center; gap: 5px; box-sizing: border-box;">
+            <%= f.time_field :evening_start_time, value: control.evening_start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 95px;" %>
+            <span style="color: #bbb;">-</span>
+            <%= f.time_field :evening_end_time, value: control.evening_end_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 95px;" %>
+          </div>
+
+          <%# 5. Action - 18% (Button ne andar lavva mate padding ane width set kari) %>
+          <div style="flex: 0 0 18%; text-align: center; padding-right: 15px; box-sizing: border-box;">
+            <%= f.submit "Update", style: "background: #27ae60; color: white; border: none; padding: 10px 0; border-radius: 8px; cursor: pointer; font-weight: bold; width: 110px; transition: 0.2s;" %>
+          </div>
+
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

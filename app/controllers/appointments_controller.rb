@@ -104,32 +104,34 @@ return render_turbo_flash
     end
   end
 
-  def show
-    @appointment = Appointment.find(params[:id])
-    @organization = @appointment.organization
-    
-    @current_serving = @organization.appointments
-                                    .where(status: :pending, created_at: Time.zone.now.all_day,
-                                    session_name: @appointment.session_name) 
-                                    .minimum(:token_number_only) || 0
+ def show
+  @appointment = Appointment.find(params[:id])
+  @organization = @appointment.organization
+  
+  # 1. Current Serving
+  @current_serving = @organization.appointments
+                                  .where(status: :pending, 
+                                         created_at: Time.zone.now.all_day,
+                                         session_name: @appointment.session_name) 
+                                  .minimum(:token_number_only) || 0
 
-    actual_max = @organization.appointments
-                               .where(created_at: Time.zone.now.all_day,
-                               session_name: @appointment.session_name) 
-                               .maximum(:token_number_only) || 0
+  # 2. Last Token Logic (Only Non-Deleted)
+  display_last = @organization.appointments
+                              .where(created_at: Time.zone.now.all_day,
+                                     session_name: @appointment.session_name)
+                              .where("token_number_only < ?", @appointment.token_number_only)
+                              .where.not(status: Appointment.statuses[:deleted])
+                              .maximum(:token_number_only) || 0
 
-    display_last = actual_max > 0 ? actual_max - 1 : 0
-    while @organization.reserved_tokens.exists?(token_number: display_last) && display_last > 0
-      display_last -= 1
-    end
-    @last_token = display_last
+  while @organization.reserved_tokens.exists?(token_number: display_last) && display_last > 0
+    display_last -= 1
   end
 
-
+  @last_token = display_last
+end
 
   private
   
-
   def check_org_status
     org_id = params[:organization_id] || params[:id] || (params[:appointment] && params[:appointment][:organization_id])
     @organization = Organization.find_by(id: org_id)
@@ -164,3 +166,7 @@ format.html {
     params.require(:appointment).permit(:patient_name, :patient_email, :patient_phone, :patient_address, :organization_id)
   end
 end
+
+
+
+

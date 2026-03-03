@@ -35,7 +35,6 @@ patch 'dashboard/:id/update_status/:status', to: 'dashboard#update_status', as: 
     resources :reserved_tokens, only: [:index, :create, :destroy] 
     # Field Settings
 
-    resources :tv_screens, only: [:show]
     # Tv Screen Show Page
 
     resources :field_settings, only: [:index] do
@@ -44,12 +43,15 @@ patch 'dashboard/:id/update_status/:status', to: 'dashboard#update_status', as: 
 
     # Notices
     resources :notices, only: [:index, :create, :destroy]
+
     # Profile
     resource :profile, only: [:edit, :update]
   end
 
   # Patient Side
   resources :appointments, only: [:new, :create, :show]
+
+get 'live_patient_tv_screen/:id', to: 'tv_screens#show', as: :tv_screen
 
   get "up" => "rails/health#show", as: :rails_health_check
   

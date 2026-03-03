@@ -29,6 +29,7 @@ def show_info
   max_booked = @organization.appointments
                             .where(created_at: current_time.all_day, 
                                    session_name: @session_label)
+                                   .where.not(status: :deleted)
                             .maximum(:token_number_only)
   
   @last_token = max_booked ? "T-#{max_booked}" : "0"
