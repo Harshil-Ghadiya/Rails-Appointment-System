@@ -22,7 +22,7 @@ def approve
 
 def login_as_admin
   @organization = Organization.find(params[:id])
-  @admin_user = @organization.users.find_by(role: 'admin') # Jo tamare role-based logic hoy to
+  @admin_user = @organization.users.find_by(role: 'admin') 
 
   if @admin_user
     sign_in(:user, @admin_user)

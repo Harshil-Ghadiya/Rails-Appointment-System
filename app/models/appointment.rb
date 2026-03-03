@@ -5,7 +5,9 @@ enum :status, { pending: 0, completed: 1, skipped: 2, deleted: 3 }, default: :pe
 
   before_create :generate_token
   
-after_commit :broadcast_to_tv, on: [:update, :destroy]
+after_commit :broadcast_to_tv, on: [ :create, :update, :destroy]
+
+
 
   def generate_token
     current_time = Time.zone.now
@@ -44,7 +46,7 @@ after_commit :broadcast_to_tv, on: [:update, :destroy]
   private
 
   def broadcast_updates
-    # Juni row kadho
+  
     broadcast_remove_to "admin_dashboard_#{organization.id}", target: "appt_row_#{id}"
 
     # Target table nakki karo

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TV Screen - <%= @organization.name %></title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body style="background: #1a1a1a; margin: 0; color: white; font-family: 'Arial', sans-serif;">
+
+  <div data-controller="tv-session">
+    <div style="background: #2c3e50; padding: 20px; text-align: center; border-bottom: 5px solid #27ae60;">
+      <h1 style="margin: 0; font-size: 40px; color: #f1c40f;"><%= @organization.name %> - QUEUE</h1>
+    </div>
+
+    <%# LIVE UPDATES CONNECTION %>
+    <%= turbo_stream_from "tv_channel_#{@organization.id}" %>
+    
+
+    <div id="tv_content" style="padding: 20px;">
+      <%= render partial: "admin/tv_screens/queue_list", locals: { organization: @organization } %>
+    </div>
+  </div>
+</body>
+</html>
