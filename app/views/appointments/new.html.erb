@@ -2,6 +2,7 @@
 <%= render 'admin/shared/sidebar' %>
 
 <%= turbo_frame_tag "main_content" do %>
+
   <% content_for :head do %>
     <meta name="turbo-cache-control" content="no-cache">
   <% end %>
@@ -31,7 +32,7 @@
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
       </div>
 
-      <%# 2. Form With (data-turbo: false jaruri nathi pan jo locho ave to muki shakay) %>
+      
       <%= form_with(model: @appointment, local: true) do |f| %>
         <%# --- HIDDEN FIELD --- %>
         <%= f.hidden_field :organization_id, value: @organization.id %>
@@ -49,7 +50,7 @@
         <% if @organization.field_settings.find_by(field_name: 'patient_email')&.is_required %>
           <div style="margin-bottom: 20px;">
             <%= f.label :patient_email, "Email Address (Optional)", style: "display: block; margin-bottom: 8px; font-weight: 600; color: #34495e;" %>
-            <%= f.email_field :patient_email, placeholder: "email@example.com", 
+            <%= f.email_field :patient_email, placeholder: "email@example.com", required: true,
                 style: "width: 100%; padding: 12px; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; font-size: 16px;" %>
           </div>
         <% end %>
@@ -58,16 +59,17 @@
         <% if @organization.field_settings.find_by(field_name: 'patient_phone')&.is_required %>
           <div style="margin-bottom: 20px;">
             <%= f.label :patient_phone, "Phone Number", style: "display: block; margin-bottom: 8px; font-weight: 600; color: #34495e;" %>
-            <%= f.telephone_field :patient_phone, placeholder: "Enter 10 digit mobile number", required: true, 
+            <%= f.telephone_field :patient_phone, placeholder: "Enter 10 digit mobile number", required: true, uniquness: true, 
                 style: "width: 100%; padding: 12px; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; font-size: 16px;" %>
           </div>
         <% end %>
 
         <%# --- 4. PATIENT ADDRESS --- %>
+
         <% if @organization.field_settings.find_by(field_name: 'patient_address')&.is_required %>
           <div style="margin-bottom: 30px;">
             <%= f.label :patient_address, "Address", style: "display: block; margin-bottom: 8px; font-weight: 600; color: #34495e;" %>
-            <%= f.text_area :patient_address, rows: 3, placeholder: "Enter your city or area", 
+            <%= f.text_area :patient_address, rows: 3, placeholder: "Enter your city or area", required: true,
                 style: "width: 100%; padding: 12px; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; font-size: 16px; resize: vertical;" %>
           </div>
         <% end %>
@@ -76,7 +78,7 @@
           <%= f.submit "Create Appointment", 
               style: "background: #27ae60; color: white; padding: 15px 40px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(39,174,96,0.3);" %>
           
-          <%# 3. URL AND REDIRECT FIX: 'data-turbo-frame: "_top"' thi URL badlai jase %>
+          
           <%= link_to "Cancel", admin_dashboard_path, 
               data: { turbo_frame: "_top" }, 
               style: "display: inline-block; margin-top: 20px; color: #7f8c8d; text-decoration: none; font-size: 14px;" %>

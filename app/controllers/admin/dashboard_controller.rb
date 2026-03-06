@@ -5,8 +5,6 @@ class Admin::DashboardController < ApplicationController
   def index 
     @organization = current_user.organization
 
-
-    
     today_range = Time.zone.now.beginning_of_day..Time.zone.now.end_of_day
     @appointments = @organization.appointments.where(created_at: today_range).order(:token_number_only)  
     respond_to do |format|
@@ -78,7 +76,8 @@ def update_status
           turbo_stream.remove("appt_row_#{@appointment.id}"),
           turbo_stream.append("#{params[:status]}_appointments", 
                                partial: "admin/dashboard/appointment_row", 
-                               locals: { appt: @appointment })
+                               locals: { appt: @appointment }),
+             turbo_stream.remove("#{params[:status]}_empty_row"),  
         ]
       end
       format.html { redirect_to admin_dashboard_path, notice: "Status updated!" }
@@ -88,9 +87,7 @@ def update_status
   end
 end
 
-
-
-  private 
+private 
 
   def ensure_admin
     unless current_user.has_role?(:admin)

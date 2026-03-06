@@ -1,14 +1,32 @@
-<h2>Verify Twilio OTP</h2>
 <% content_for :head do %>
   <meta name="turbo-cache-control" content="no-cache">
 <% end %>
-<%= form_tag verify_otp_path, method: :post do %>
-  <div class="field">
-    <p><%= label_tag :otp, "Enter 6-Digit OTP sent to your mobile" %></p>
-    <p><%= text_field_tag :otp, nil, placeholder: "123456", required: true, maxlength: 6 %></p>
-  </div>
 
-  <div class="actions">
-    <%= submit_tag "Verify & Login" %>
+<div style="height: 100vh; display: flex; align-items: center; justify-content: center; background: #f8fafc; font-family: system-ui, sans-serif;">
+  <div style="width: 100%; max-width: 360px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center;">
+    
+    <h2 style="color: #1e293b; margin-bottom: 8px; font-size: 22px;">OTP Verification</h2>
+    <p style="color: #64748b; font-size: 14px; margin-bottom: 25px;">Enter the 6-digit code we sent you.</p>
+
+    <%= form_tag verify_otp_path, method: :post do %>
+      <%= text_field_tag :otp, nil, 
+          placeholder: "0 0 0 0 0 0", 
+          required: true, 
+          maxlength: 6, 
+          inputmode: "numeric",
+          style: "width: 100%; padding: 12px; font-size: 26px; text-align: center; letter-spacing: 12px; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px; outline: none; transition: 0.2s;",
+          onfocus: "this.style.borderColor='#3b82f6'"
+      %>
+
+      <%= submit_tag "Verify & Login", 
+          style: "width: 100%; background: #3b82f6; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s;",
+          onmouseover: "this.style.opacity='0.9'",
+          data: { disable_with: "Checking..." }
+      %>
+    <% end %>
+
+    <p style="margin-top: 20px; font-size: 13px; color: #94a3b8;">
+      Didn't get the code? <a href="#" style="color: #3b82f6; text-decoration: none; font-weight: 500;">Resend</a>
+    </p>
   </div>
-<% end %>
+</div>

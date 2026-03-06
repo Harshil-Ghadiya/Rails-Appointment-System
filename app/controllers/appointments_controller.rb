@@ -1,3 +1,5 @@
+# // new code 
+
 class AppointmentsController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
   before_action :check_org_status, only: [:new, :create, :show]
@@ -10,28 +12,26 @@ class AppointmentsController < ApplicationController
 
     # 1. Check Start/Stop
     if @organization.is_booking_stopped
-flash.now[:alert] = "Booking is currently stopped by the Hospital."
-      return render_turbo_flash # Dashboard par redirect nahi, khali Toast! 
-         end
+      flash.now[:alert] = "Booking is currently stopped by the Hospital."
+      return render_turbo_flash 
+    end
 
     # 2. Check Time Logic
     if @booking_control.present?
       current_time_str = Time.zone.now.strftime("%H:%M")
       is_morning = current_time_str < @booking_control.evening_start_time.strftime("%H:%M")
-
       start_t = is_morning ? @booking_control.morning_start_time.strftime("%H:%M") : @booking_control.evening_start_time.strftime("%H:%M")
       end_t   = is_morning ? @booking_control.morning_end_time.strftime("%H:%M") : @booking_control.evening_end_time.strftime("%H:%M")
       @session_label = is_morning ? "Morning" : "Evening"
 
       unless current_time_str.between?(start_t, end_t)
-flash.now[:alert] = "Booking for #{today_name} is only open between #{start_t} and #{end_t}."
+        flash.now[:alert] = "Booking for #{today_name} is only open between #{start_t} and #{end_t}."
         return render_turbo_flash
-        end 
-
+      end
     else
-flash.now[:alert] = "Hospital is closed today (#{today_name})."
-return render_turbo_flash
-   end
+      flash.now[:alert] = "Hospital is closed today (#{today_name})."
+      return render_turbo_flash
+    end
     
     @appointment = @organization.appointments.new
     @field_settings = @organization.field_settings
@@ -54,16 +54,19 @@ return render_turbo_flash
     session_name = (current_time_str < control.evening_start_time.strftime("%H:%M")) ? "Morning" : "Evening"
     @appointment.session_name = session_name
 
-    # --- Token Generation logic ---
-    last_token_record = @organization.appointments
-                                     .where(created_at: Time.zone.now.all_day, session_name: session_name)
-                                     .maximum(:token_number_only)
-
-    last_token = last_token_record ? last_token_record.to_i : 0
-    next_token = last_token + 1
-    reserved_nums = @organization.reserved_tokens.pluck(:token_number).map(&:to_i)
+    # --- GAP FILLING LOGIC (Matching with Appointment.rb) ---
+    existing_nums = @organization.appointments
+                                 .where(created_at: Time.zone.now.all_day, session_name: session_name)
+                                 .where.not(status: :deleted)
+                                 .pluck(:token_number_only)
     
-    while reserved_nums.include?(next_token)
+    reserved_nums = @organization.reserved_tokens.pluck(:token_number).map(&:to_i)
+
+    next_token = 1
+    loop do
+      unless existing_nums.include?(next_token) || reserved_nums.include?(next_token)
+        break
+      end
       next_token += 1
     end
 
@@ -77,13 +80,19 @@ return render_turbo_flash
       @current_serving = @organization.appointments
                                       .where(status: :pending, created_at: Time.zone.now.all_day, session_name: session_name)
                                       .minimum(:token_number_only) || 0
-    temp_last = next_token > 1 ? next_token - 1 : 0
       
-      while temp_last > 0 && reserved_nums.include?(temp_last)
-        temp_last -= 1
+      # LAST TOKEN logic (excluding deleted)
+      display_last = @organization.appointments
+                                  .where(created_at: Time.zone.now.all_day, session_name: session_name)
+                                  .where("token_number_only < ?", @appointment.token_number_only)
+                                  .where.not(status: :deleted)
+                                  .maximum(:token_number_only) || 0
+
+      while @organization.reserved_tokens.exists?(token_number: display_last) && display_last > 0
+        display_last -= 1
       end
       
-      @last_token = temp_last
+      @last_token = display_last
 
       respond_to do |format|
         format.turbo_stream do
@@ -104,31 +113,31 @@ return render_turbo_flash
     end
   end
 
- def show
-  @appointment = Appointment.find(params[:id])
-  @organization = @appointment.organization
-  
-  # 1. Current Serving
-  @current_serving = @organization.appointments
-                                  .where(status: :pending, 
-                                         created_at: Time.zone.now.all_day,
-                                         session_name: @appointment.session_name) 
-                                  .minimum(:token_number_only) || 0
+  def show
+    @appointment = Appointment.find(params[:id])
+    @organization = @appointment.organization
+    
+    # 1. Current Serving
+    @current_serving = @organization.appointments
+                                    .where(status: :pending, 
+                                           created_at: Time.zone.now.all_day,
+                                           session_name: @appointment.session_name) 
+                                    .minimum(:token_number_only) || 0
 
-  # 2. Last Token Logic (Only Non-Deleted)
-  display_last = @organization.appointments
-                              .where(created_at: Time.zone.now.all_day,
-                                     session_name: @appointment.session_name)
-                              .where("token_number_only < ?", @appointment.token_number_only)
-                              .where.not(status: Appointment.statuses[:deleted])
-                              .maximum(:token_number_only) || 0
+    # 2. Last Token Logic (Only Non-Deleted)
+    display_last = @organization.appointments
+                                .where(created_at: Time.zone.now.all_day,
+                                       session_name: @appointment.session_name)
+                                .where("token_number_only < ?", @appointment.token_number_only)
+                                .where.not(status: Appointment.statuses[:deleted])
+                                .maximum(:token_number_only) || 0
 
-  while @organization.reserved_tokens.exists?(token_number: display_last) && display_last > 0
-    display_last -= 1
+    while @organization.reserved_tokens.exists?(token_number: display_last) && display_last > 0
+      display_last -= 1
+    end
+
+    @last_token = display_last
   end
-
-  @last_token = display_last
-end
 
   private
   
@@ -148,24 +157,191 @@ end
     end
   end
 
-
-
   def render_turbo_flash
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.prepend("flash-container", partial: "layouts/flash")
       end
-
-format.html { 
-        redirect_to "/patient_info/#{@organization.id}", alert: flash.now[:alert] 
-      }
- end
+      format.html { redirect_to "/patient_info/#{@organization.id}", alert: flash.now[:alert] }
+    end
   end
-
+  
   def appointment_params
     params.require(:appointment).permit(:patient_name, :patient_email, :patient_phone, :patient_address, :organization_id)
   end
 end
+
+
+# // old code 
+
+
+# class AppointmentsController < ApplicationController
+#   skip_before_action :authenticate_user!, raise: false
+#   before_action :check_org_status, only: [:new, :create, :show]
+
+#   def new
+#     @organization = Organization.find(params[:id])
+#     today_name = Time.zone.now.strftime("%A")  
+#     @settings = @organization.field_settings.where(is_required: true).pluck(:field_name)
+#     @booking_control = @organization.booking_controls.find_by(day_name: today_name)
+
+#     # 1. Check Start/Stop
+#     if @organization.is_booking_stopped
+# flash.now[:alert] = "Booking is currently stopped by the Hospital."
+#       return render_turbo_flash 
+#          end
+
+#     # 2. Check Time Logic
+#     if @booking_control.present?
+#       current_time_str = Time.zone.now.strftime("%H:%M")
+#       is_morning = current_time_str < @booking_control.evening_start_time.strftime("%H:%M")
+#       start_t = is_morning ? @booking_control.morning_start_time.strftime("%H:%M") : @booking_control.evening_start_time.strftime("%H:%M")
+#       end_t   = is_morning ? @booking_control.morning_end_time.strftime("%H:%M") : @booking_control.evening_end_time.strftime("%H:%M")
+#       @session_label = is_morning ? "Morning" : "Evening"
+
+#       unless current_time_str.between?(start_t, end_t)
+# flash.now[:alert] = "Booking for #{today_name} is only open between #{start_t} and #{end_t}."
+#         return render_turbo_flash
+#         end
+        
+#     else
+# flash.now[:alert] = "Hospital is closed today (#{today_name})."
+# return render_turbo_flash
+#    end
+    
+#     @appointment = @organization.appointments.new
+#     @field_settings = @organization.field_settings
+#     @notices = @organization.notices.where(notice_type: ['booking_window', 'general'])
+#   end
+
+#   def create
+#     @organization = Organization.find(params[:appointment][:organization_id])
+#     @appointment = @organization.appointments.new(appointment_params)
+
+#     today_name = Time.zone.now.strftime("%A") 
+#     control = @organization.booking_controls.find_by(day_name: today_name)
+    
+#     if control.nil? || @organization.is_booking_stopped
+#       flash.now[:alert] = "Booking is not available right now."
+#       return render_turbo_flash
+#     end
+
+#     current_time_str = Time.zone.now.strftime("%H:%M")
+#     session_name = (current_time_str < control.evening_start_time.strftime("%H:%M")) ? "Morning" : "Evening"
+#     @appointment.session_name = session_name
+
+#     # --- Token Generation logic ---
+#     last_token_record = @organization.appointments
+#                                      .where(created_at: Time.zone.now.all_day, session_name: session_name)
+#                                      .maximum(:token_number_only)
+
+#     last_token = last_token_record ? last_token_record.to_i : 0
+#     next_token = last_token + 1
+#     reserved_nums = @organization.reserved_tokens.pluck(:token_number).map(&:to_i)
+    
+#     while reserved_nums.include?(next_token)
+#       next_token += 1
+#     end
+
+#     @appointment.token_number_only = next_token
+#     @appointment.token_number = "#{control.token_prefix}-#{next_token}"
+#     @appointment.status = "pending"
+    
+#     if @appointment.save
+#       flash.now[:notice] = 'Appointment booked successfully!'
+      
+#       @current_serving = @organization.appointments
+#                                       .where(status: :pending, created_at: Time.zone.now.all_day, session_name: session_name)
+#                                       .minimum(:token_number_only) || 0
+#     temp_last = next_token > 1 ? next_token - 1 : 0
+      
+#       while temp_last > 0 && reserved_nums.include?(temp_last)
+#         temp_last -= 1
+#       end
+      
+#       @last_token = temp_last
+
+#       respond_to do |format|
+#         format.turbo_stream do
+#           render turbo_stream: [
+#             turbo_stream.prepend("flash-container", partial: "layouts/flash"),
+#             turbo_stream.replace("main_content", template: "appointments/show")
+#           ]
+#         end
+#         format.html { redirect_to appointment_path(@appointment) }
+#       end
+#     else
+#       # Validation Fail Case
+#       flash.now[:alert] = @appointment.errors.full_messages.to_sentence
+#       @booking_control = control
+#       @field_settings = @organization.field_settings
+#       @notices = @organization.notices.where(notice_type: 'booking_window')
+#       render_turbo_flash
+#     end
+#   end
+
+#  def show
+#   @appointment = Appointment.find(params[:id])
+#   @organization = @appointment.organization
+  
+#   # 1. Current Serving
+#   @current_serving = @organization.appointments
+#                                   .where(status: :pending, 
+#                                          created_at: Time.zone.now.all_day,
+#                                          session_name: @appointment.session_name) 
+#                                   .minimum(:token_number_only) || 0
+
+#   # 2. Last Token Logic (Only Non-Deleted)
+#   display_last = @organization.appointments
+#                               .where(created_at: Time.zone.now.all_day,
+#                                      session_name: @appointment.session_name)
+#                               .where("token_number_only < ?", @appointment.token_number_only)
+#                               .where.not(status: Appointment.statuses[:deleted])
+#                               .maximum(:token_number_only) || 0
+
+#   while @organization.reserved_tokens.exists?(token_number: display_last) && display_last > 0
+#     display_last -= 1
+#   end
+
+#   @last_token = display_last
+# end
+
+#   private
+  
+#   def check_org_status
+#     org_id = params[:organization_id] || params[:id] || (params[:appointment] && params[:appointment][:organization_id])
+#     @organization = Organization.find_by(id: org_id)
+
+#     if @organization.nil? && params[:id]
+#       @appointment = Appointment.find_by(id: params[:id])
+#       @organization = @appointment&.organization
+#     end
+
+#     if @organization.nil?
+#       redirect_to root_path, alert: "Organization not found."
+#     elsif !@organization.is_approved
+#       render plain: "This organization is currently inactive. Please contact the administrator.", status: :forbidden
+#     end
+#   end
+
+
+
+#   def render_turbo_flash
+#     respond_to do |format|
+#       format.turbo_stream do
+#         render turbo_stream: turbo_stream.prepend("flash-container", partial: "layouts/flash")
+#       end
+
+# format.html { 
+#         redirect_to "/patient_info/#{@organization.id}", alert: flash.now[:alert] 
+#       }
+#  end
+#   end
+
+#   def appointment_params
+#     params.require(:appointment).permit(:patient_name, :patient_email, :patient_phone, :patient_address, :organization_id)
+#   end
+# end
 
 
 

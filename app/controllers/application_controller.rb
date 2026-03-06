@@ -1,10 +1,8 @@
 class ApplicationController < ActionController::Base
   allow_browser versions: :modern
   
-  # Browser back-forward history secure karva mate
   before_action :set_no_cache
 
-  # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
   def after_sign_in_path_for(resource)
@@ -28,5 +26,4 @@ class ApplicationController < ActionController::Base
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
   end
-
  end

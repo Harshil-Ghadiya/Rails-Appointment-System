@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_26_053817) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_05_080157) do
   create_table "appointments", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "organization_id"
@@ -72,6 +72,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_26_053817) do
   create_table "reserved_tokens", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "organization_id"
+    t.string "session_name"
     t.integer "token_number"
     t.datetime "updated_at", null: false
   end
