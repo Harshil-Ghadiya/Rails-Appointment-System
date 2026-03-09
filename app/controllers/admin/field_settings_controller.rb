@@ -28,10 +28,13 @@ def update_all
       format.html { redirect_to admin_field_settings_path, alert: flash.now[:alert] }
     end
   else
+    ActiveRecord::Base.transaction do
     params[:fields].each do |id, val|
       setting = current_user.organization.field_settings.find(id)
       setting.update(is_required: val[:is_required] == "1") 
     end
+  end
+  
 
     @settings = current_user.organization.field_settings.order(:created_at)
     flash.now[:notice] = "Form settings updated successfully!"
@@ -40,7 +43,6 @@ def update_all
       format.turbo_stream do
         render turbo_stream: [
           turbo_stream.prepend("flash-container", partial: "layouts/flash"),
-          turbo_stream.replace("field_settings_container", partial: "admin/field_settings/settings_form", locals: { settings: @settings })
         ]
       end
       format.html { redirect_to admin_field_settings_path, notice: flash.now[:notice] }

@@ -1,5 +1,6 @@
 <%= turbo_frame_tag "main_content" do %>
-          <%= render 'admin/shared/sidebar' %>
+
+<%= turbo_stream_from "patient_info_channel_#{@organization.id}" %>
 
 <div style="max-width: 500px; margin: 40px auto; font-family: 'Segoe UI', sans-serif; padding: 20px; text-align: center;">
   <div style="background: white; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; border: 2px solid #2980b9;">
@@ -23,15 +24,15 @@
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
         <div style="background: #e3f2fd; padding: 15px; border-radius: 12px;">
           <small style="color: #1565c0; font-weight: bold;">CURRENT TOKEN</small>
-          <div style="font-size: 22px; font-weight: bold; color: #0d47a1;">T-<%= @current_serving %></div>
+          <div id="current_token_display" style="font-size: 22px; font-weight: bold; color: #0d47a1;">T-<%= @current_serving %></div>
         </div>
         <div style="background: #f1f8e9; padding: 15px; border-radius: 12px;">
           <small style="color: #2e7d32; font-weight: bold;">LAST TOKEN</small>
-          <div style="font-size: 22px; font-weight: bold; color: #1b5e20;">T-<%= @last_token %></div>
+          <div id="last_token_display" style="font-size: 22px; font-weight: bold; color: #1b5e20;">T-<%= @last_token %></div>
         </div>
       </div> 
 
-   <div style="text-align: center; margin-bottom: 30px; padding: 15px; border-radius: 12px; background: #fff3e0;">
+   <div id="doctor_status_display" style="text-align: center; margin-bottom: 30px; padding: 15px; border-radius: 12px; background: #fff3e0;">
          <span style="color: #e65100; font-weight: bold;">👨‍⚕️ DOCTOR STATUS: </span>
          <span style="background: #ff9800; color: white; padding: 4px 12px; border-radius: 20px; font-size: 14px;">
            <%= @organization.doctor_status || "Available" %>

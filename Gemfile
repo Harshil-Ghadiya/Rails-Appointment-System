@@ -29,7 +29,8 @@ gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
 gem 'rolify'
-
+# Gemfile
+gem "redis", ">= 4.0"
 gem 'rqrcode'
 gem "twilio-ruby"
 gem 'dotenv-rails', groups: [:development, :test]

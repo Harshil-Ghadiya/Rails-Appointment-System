@@ -1,10 +1,15 @@
 <%= turbo_frame_tag "main_content" do %>
+
+<%= turbo_stream_from "admin_dashboard_#{@organization.id}" %>
 <div style="display: flex;">
   <div style="margin-left: 50px; padding: 30px; flex: 1;">
     <h3 style="color: #2c3e50;"> Weekly Booking Schedule</h3>
     <p style="color: #7f8c8d;">Set opening and closing hours for each day.</p>
 
-    <%= render 'schedule_table', booking_controls: @booking_controls %>
+<div id="booking_schedule_container">
+      <%= render 'schedule_table', booking_controls: @booking_controls %>
+      </div>
+      
   </div>
 </div>
 <% end %>

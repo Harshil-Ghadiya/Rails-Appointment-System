@@ -6,7 +6,7 @@ class Admin::NoticesController < ApplicationController
 
   def index
     @notices = current_user.organization.notices.order(created_at: :desc)
-    @notice = Notice.new 
+    @notice = Notice.new
   end
 
   def create

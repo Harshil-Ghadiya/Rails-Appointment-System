@@ -1,5 +1,4 @@
 <%# 1. Sidebar ne Frame ni bahar rakho jethi e gayab na thay %>
-<%= render 'admin/shared/sidebar' %>
 
 <%= turbo_frame_tag "main_content" do %>
 
@@ -33,7 +32,7 @@
       </div>
 
       
-      <%= form_with(model: @appointment, local: true) do |f| %>
+      <%= form_with(model: @appointment, local: true, data: { turbo_frame: "_top" }) do |f| %>
         <%# --- HIDDEN FIELD --- %>
         <%= f.hidden_field :organization_id, value: @organization.id %>
 

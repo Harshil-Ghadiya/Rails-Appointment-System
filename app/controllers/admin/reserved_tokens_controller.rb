@@ -4,6 +4,7 @@ class Admin::ReservedTokensController < ApplicationController
   before_action :ensure_admin
 
   def index
+    @organization = current_user.organization
     @reserved_tokens = current_user.organization.reserved_tokens.order(:session_name, :token_number)
   end
 

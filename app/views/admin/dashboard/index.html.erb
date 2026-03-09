@@ -4,38 +4,18 @@
     <meta name="turbo-cache-control" content="no-cache">
   <% end %>
 
+  <%= turbo_stream_from "admin_dashboard_#{@organization.id}" %>
+
   <div class="dashboard-wrapper" style="background: #f4f7f6; font-family: 'Segoe UI', Tahoma, sans-serif; min-height: 100vh;">
     
     <div class="main-content" style="padding: 30px; margin-left: 50px;  max-width: 1300px;">
-      
-      <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px;">
-        
-        <div id="booking_status_area" style="flex: 1;">
-          <h4 style="margin: 0; color: #2a3839; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Booking Control</h4>
-          <div style="margin-top: 10px;">
-            <%= button_to (@organization.is_booking_stopped ? "START BOOKING" : "STOP BOOKING"), 
-                admin_toggle_booking_path, method: :patch, data: { turbo_frame: "main_content" },
-                style: "background: #{@organization.is_booking_stopped ? '#27ae60' : '#e74c3c'}; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" %>
-          </div>
-        </div>
 
-        
-        <div id="doctor_status_area" style="flex: 2; text-align: center; border-left: 1px solid #eee; border-right: 1px solid #eee; padding: 0 30px;">
-          <h4 style="margin: 0; color: #7f8c8d; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Doctor Status</h4>
-          <h3 style="margin: 8px 0; color: #2980b9; font-weight: 800; font-size: 22px;"><%= @organization.doctor_status || "Available" %></h3>
-          <div style="display: flex; gap: 8px; justify-content: center;">
-            <%= button_to "Available", admin_update_doctor_status_path(status: "Available"), method: :patch, data: { turbo_frame: "main_content" }, style: "cursor:pointer; padding: 6px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #27ae60; background: white; color: #27ae60; font-weight: bold;" %>
-            <%= button_to "Busy", admin_update_doctor_status_path(status: "Busy"), method: :patch, data: { turbo_frame: "main_content" }, style: "cursor:pointer; padding: 6px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #f39c12; background: white; color: #f39c12; font-weight: bold;" %>
-            <%= button_to "Away", admin_update_doctor_status_path(status: "Away"), method: :patch, data: { turbo_frame: "main_content" }, style: "cursor:pointer; padding: 6px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #e74c3c; background: white; color: #e74c3c; font-weight: bold;" %>
-          </div>
-        </div>
-        
-        <div style="flex: 1; text-align: right;">
-          <h2 style="margin: 0; color: #2c3e50; font-size: 20px;">Welcome Back!</h2>
-          <p style="margin: 5px 0; color: #3498db; font-weight: 600;"><%= current_user.name %></p>
-        </div>
+
+      <div id="admin_controls_section">
+        <%= render "admin/dashboard/controls", organization: @organization %>
       </div>
 
-    </div>
-  </div>
+      </div>
+      </div>
+
 <% end %>

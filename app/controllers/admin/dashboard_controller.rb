@@ -61,23 +61,17 @@ def toggle_booking
     end
   end
 
-
 def update_status
   @appointment = current_user.organization.appointments.find(params[:id])
   
   if @appointment.update(status: params[:status])
-
     flash.now[:notice] = "Token #{@appointment.token_number} moved to #{params[:status].capitalize}!"
 
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: [
-          turbo_stream.prepend("flash-container", partial: "layouts/flash"),
-          turbo_stream.remove("appt_row_#{@appointment.id}"),
-          turbo_stream.append("#{params[:status]}_appointments", 
-                               partial: "admin/dashboard/appointment_row", 
-                               locals: { appt: @appointment }),
-             turbo_stream.remove("#{params[:status]}_empty_row"),  
+          # Khali flash message j ahiya thi moklo
+          turbo_stream.prepend("flash-container", partial: "layouts/flash")
         ]
       end
       format.html { redirect_to admin_dashboard_path, notice: "Status updated!" }

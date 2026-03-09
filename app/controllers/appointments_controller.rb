@@ -98,7 +98,8 @@ class AppointmentsController < ApplicationController
         format.turbo_stream do
           render turbo_stream: [
             turbo_stream.prepend("flash-container", partial: "layouts/flash"),
-            turbo_stream.replace("main_content", template: "appointments/show")
+            turbo_stream.replace("main_content", template: "appointments/show"),
+            turbo_stream.action(:advance, appointment_path(@appointment))
           ]
         end
         format.html { redirect_to appointment_path(@appointment) }

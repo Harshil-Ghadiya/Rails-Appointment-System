@@ -1,4 +1,4 @@
-<%= form_with model: [:admin, ReservedToken.new], style: "display: flex; gap: 10px;" do |f| %>
+<%= form_with model: [:admin, ReservedToken.new], id: "new_reserved_token_form", style: "display: flex; gap: 10px;" do |f| %>
   <%= f.number_field :token_number, placeholder: "e.g. 5", required: true, 
       style: "padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 200px;" %>
   <%= f.submit "Reserve This Number", 

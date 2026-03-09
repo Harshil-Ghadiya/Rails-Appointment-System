@@ -8,6 +8,7 @@
       <p style="color: #95a5a6; margin-top: 5px;">Manage live patient queues and statuses for today.</p>
     </div>
 
+
     <%= turbo_stream_from "admin_dashboard_#{@organization.id}" %>
 
     <% [
@@ -31,7 +32,6 @@
               <th style="padding: 12px 10px; width: 25%; text-align: right;">ACTIONS</th>
             </tr>
           </thead>
-          <%# --- TBODY ID MUST MATCH WITH CONTROLLER APPEND --- %>
           <tbody id="<%= section[:id] %>_appointments">
             <% section_appts = @appointments.where(status: section[:id]) %>
             <% if section_appts.any? %>
@@ -39,12 +39,7 @@
                 <%= render 'admin/dashboard/appointment_row', appt: appt %>
               <% end %>
             <% else %>
-              <%# --- ID matching for Turbo Stream Remove --- %>
-              <tr id="<%= section[:id] %>_empty_row">
-                <td colspan="4" style="text-align: center; padding: 25px; color: #bdc3c7; font-size: 14px;">
-                  No <%= section[:title].downcase %> recorded yet.
-                </td>
-              </tr>
+            <%= render 'admin/dashboard/empty_row', status: section[:id] %>
             <% end %>
           </tbody>
         </table>

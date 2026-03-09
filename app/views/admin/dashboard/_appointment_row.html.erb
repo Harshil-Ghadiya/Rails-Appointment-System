@@ -1,5 +1,4 @@
 <tr id="appt_row_<%= appt.id %>" style="border-bottom: 1px solid #f4f7f6; transition: background 0.2s;">
-  <%# --- TOKEN SECTION (15%) --- %>
   <td style="padding: 15px 10px; width: 15%; vertical-align: middle;">
     <% if appt.status != 'pending' %>
       <small style="color: #95a5a6; display: block; font-size: 9px; margin-bottom: 2px;">TOKEN</small>
@@ -7,7 +6,6 @@
     <span style="font-weight: bold; font-size: 15px; color: #2c3e50;"><%= appt.token_number %></span>
   </td>
 
-  <%# --- PATIENT NAME SECTION (45%) --- %>
   <td style="padding: 15px 10px; width: 45%; vertical-align: middle;">
     <% if appt.status != 'pending' %>
       <small style="color: #95a5a6; display: block; font-size: 9px; margin-bottom: 2px;">PATIENT NAME</small>
@@ -15,7 +13,6 @@
     <span style="color: #34495e; font-weight: 500;"><%= appt.patient_name %></span>
   </td>
 
-  <%# --- STATUS SECTION (15%) --- %>
   <td style="padding: 15px 10px; width: 15%; text-align: center; vertical-align: middle;">
     <% if appt.status != 'pending' %>
       <small style="color: #95a5a6; display: block; font-size: 9px; margin-bottom: 4px;">STATUS</small>
@@ -26,11 +23,9 @@
     </span>
   </td>
 
-  <%# --- ACTIONS SECTION (25%) --- %>
   <td style="padding: 15px 10px; width: 25%; text-align: right; vertical-align: middle;">
     <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center;">
       
-      <%# --- IF PENDING: Show Action Buttons --- %>
       <% if appt.status == 'pending' %>
         <%= link_to admin_update_appt_status_path(appt.id, 'completed'), 
             data: { turbo_method: :patch }, 
@@ -49,23 +44,7 @@
             style: "color: #e74c3c; text-decoration: none; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 4px;" do %>
           🗑️ <span style="border-bottom: 1px solid #e74c3c;">Delete</span>
         <% end %>
-
-      <%# --- IF SKIPPED: Show Re-Queue Button --- %>
-      <% elsif appt.status == 'skipped' %>
-        <%= link_to admin_update_appt_status_path(appt.id, 'pending'), 
-            data: { turbo_method: :patch }, 
-            style: "color: #3498db; text-decoration: none; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 4px;" do %>
-          🔄 <span style="border-bottom: 1px solid #3498db;">Go to Pending (Unskip)</span>
-        <% end %>
-        
-        <%# Deleted option pan rakhi shakiye skipped mathi jo cancel karvu hoy to %>
-        <%= link_to admin_update_appt_status_path(appt.id, 'deleted'), 
-            data: { turbo_method: :patch, turbo_confirm: "Delete this skipped appointment?" }, 
-            style: "color: #e74c3c; text-decoration: none; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 4px;" do %>
-          🗑️
-        <% end %>
       <% end %>
-
     </div>
   </td>
 </tr>

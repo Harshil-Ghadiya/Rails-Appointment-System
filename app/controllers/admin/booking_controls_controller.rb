@@ -17,7 +17,7 @@ class Admin::BookingControlsController < ApplicationController
 
 def update
   @control = current_user.organization.booking_controls.find(params[:id])
-  @booking_controls = current_user.organization.booking_controls # Index mate badha controls fari thi joise
+  @booking_controls = current_user.organization.booking_controls
   
   if @control.update(params.require(:booking_control).permit(:token_prefix, :morning_start_time, :morning_end_time, :evening_start_time, :evening_end_time))
     flash.now[:notice] = "Booking time for #{@control.day_name} updated!"
