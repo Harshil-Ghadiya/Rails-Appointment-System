@@ -1,6 +1,8 @@
 class BookingControl < ApplicationRecord
   belongs_to :organization
-
+  has_many :booking_slots, dependent: :destroy
+  accepts_nested_attributes_for :booking_slots, allow_destroy: true,
+  reject_if: proc { |attributes| attributes['start_time'].blank? || attributes['end_time'].blank? }
   after_update_commit :broadcast_schedule_changes
 
 private 

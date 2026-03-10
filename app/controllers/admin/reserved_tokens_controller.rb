@@ -23,13 +23,19 @@ class Admin::ReservedTokensController < ApplicationController
                                     .exists?
 
     respond_to do |format|
-      if is_already_booked
-        flash.now[:alert] = "Error: Token #{num} is already booked in #{current_session} session!"
+
+      if current_session == "No-Active-Slot"
+        flash.now[:alert] = "Error: Cannot reserve tokens during break time!"
+        format.turbo_stream { render turbo_stream: turbo_stream.prepend("flash-container", partial: "layouts/flash") }
+
+
+      elsif is_already_booked
+        flash.now[:alert] = "Error: Token #{num} is already booked in current session!"
         format.turbo_stream { render turbo_stream: turbo_stream.prepend("flash-container", partial: "layouts/flash") }
         format.html { redirect_to admin_reserved_tokens_path }
         
       elsif @reserved_token.save
-        flash.now[:notice] = "Token #{@reserved_token.token_number} has been reserved for #{current_session}!"
+        flash.now[:notice] = "Token #{@reserved_token.token_number} has been reserved for current set time!"
         format.turbo_stream do
           render turbo_stream: [
             turbo_stream.prepend("flash-container", partial: "layouts/flash"),
@@ -73,11 +79,19 @@ class Admin::ReservedTokensController < ApplicationController
     control = org.booking_controls.find_by(day_name: day_name)
     
     if control.present?
-      e_start_time = control.evening_start_time.strftime("%H:%M")
-      current_time_str = current_time.strftime("%H:%M")
-      current_time_str < e_start_time ? "Morning" : "Evening"
+      now_str = current_time.strftime("%H:%M")
+      active_slot = control.booking_slots
+                           .where("strftime('%H:%M', start_time) <= ? AND strftime('%H:%M', end_time) >= ?", 
+                                  now_str, now_str).first
+                                  
+      if active_slot.present?
+        "Slot-#{active_slot.id}"
+      else
+        "No-Active-Slot"
+      end
+
     else
-      "Morning"
+      "Default"
     end
   end
 
@@ -92,4 +106,3 @@ class Admin::ReservedTokensController < ApplicationController
     end
   end
 end
-

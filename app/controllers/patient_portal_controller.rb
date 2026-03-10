@@ -1,6 +1,6 @@
 class PatientPortalController < ApplicationController
 
-  skip_before_action :authenticate_user!, only: [:show_info], raise: false 
+skip_before_action :authenticate_user!, only: [:show_info], raise: false 
 before_action :check_org_status, only: [:show_info]
 
 def show_info
@@ -9,16 +9,21 @@ def show_info
   day_name = current_time.strftime("%A")
   control = @organization.booking_controls.find_by(day_name: day_name)
 
-  if control.present?
-    current_time_str = current_time.strftime("%H:%M")
-    e_start = control.evening_start_time.strftime("%H:%M")
-    @session_label = current_time_str < e_start ? "Morning" : "Evening"
-  else
-    @session_label = "Morning"
-  end
+now_str = current_time.strftime("%H:%M")
+    active_slot = control&.booking_slots
+                         &.where("strftime('%H:%M', start_time) <= ? AND strftime('%H:%M', end_time) >= ?", 
+                                 now_str, now_str)&.first
 
-  
-  min_pending = @organization.appointments
+    if active_slot.present?
+      @session_label = "Slot-#{active_slot.id}"
+      prefix = control.token_prefix || "T"
+    else
+      # Jo break time hoy to empty label
+      @session_label = "No-Active-Slot"
+      prefix = control&.token_prefix || "T"
+    end
+    
+    min_pending = @organization.appointments
                              .where(created_at: current_time.all_day, 
                                     session_name: @session_label, 
                                     status: :pending)
@@ -34,6 +39,9 @@ def show_info
   
   @last_token = max_booked ? "T-#{max_booked}" : "0"
 end
+
+
+private 
 
   def check_org_status
   @appointment = Appointment.find_by(id: params[:id])

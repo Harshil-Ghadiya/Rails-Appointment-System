@@ -1,15 +1,17 @@
 <%= turbo_frame_tag "main_content" do %>
+  <%= turbo_stream_from "admin_dashboard_#{@organization.id}" %>
+  <div style="display: flex;">
+    <div style="margin-left: 50px; padding: 30px; flex: 1;">
+      <h3 style="color: #2c3e50;">📅 Weekly Slot Management</h3>
+      <p style="color: #7f8c8d;">Define multiple booking slots for each day. Patients can only book during these active windows.</p>
 
-<%= turbo_stream_from "admin_dashboard_#{@organization.id}" %>
-<div style="display: flex;">
-  <div style="margin-left: 50px; padding: 30px; flex: 1;">
-    <h3 style="color: #2c3e50;"> Weekly Booking Schedule</h3>
-    <p style="color: #7f8c8d;">Set opening and closing hours for each day.</p>
-
-<div id="booking_schedule_container">
-      <%= render 'schedule_table', booking_controls: @booking_controls %>
+      <div id="booking_schedule_container">
+        <%= render 'schedule_table', booking_controls: @booking_controls %>
       </div>
       
+      <div style="margin-top: 20px; padding: 15px; background: #fffde7; border-left: 4px solid #fbc02d; color: #856404; font-size: 14px;">
+        <strong>Note:</strong> Tokens will automatically reset to #1 at the start of each new slot.
+      </div>
+    </div>
   </div>
-</div>
 <% end %>

@@ -7,18 +7,24 @@ def show
     current_time = Time.zone.now
     day_name = current_time.strftime("%A")
     @booking_control = @organization.booking_controls.find_by(day_name: day_name)
+if @booking_control.present?
 
-    if @booking_control.present?
-      current_time_str = current_time.strftime("%H:%M")
-      evening_start = @booking_control.evening_start_time.strftime("%H:%M")
-      
-      if current_time_str < evening_start
-        @current_session = "Morning"
+now_str = current_time.strftime("%H:%M")
+      active_slot = @booking_control.booking_slots
+                                    .where("strftime('%H:%M', start_time) <= ? AND strftime('%H:%M', end_time) >= ?", 
+                                           now_str, now_str).first
+
+      if active_slot.present?
+        # Unique Session ID set karo
+        @current_session = "Slot-#{active_slot.id}"
       else
-        @current_session = "Evening"
+        # Jo break time hoy
+        @current_session = "No Active Slot"
       end
     else
-      @current_session = "Morning"
+      @current_session = "Default"
     end
-  end 
+
+  end
 end
+

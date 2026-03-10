@@ -5,18 +5,28 @@
     ctrl = organization.booking_controls.find_by(day_name: today_name)
 
     if ctrl.present?
-      current_time_str = current_time.strftime("%H:%M")
-      evening_start = ctrl.evening_start_time.strftime("%H:%M")
-      session_now = (current_time_str < evening_start) ? "Morning" : "Evening"
+      # --- ACTIVE SLOT LOGIC ---
+      now_str = current_time.strftime("%H:%M")
+      active_slot = ctrl.booking_slots
+                        .where("strftime('%H:%M', start_time) <= ? AND strftime('%H:%M', end_time) >= ?", 
+                               now_str, now_str).first
 
-      apps = organization.appointments
-                         .where(status: 0, session_name: session_now)
-                         .where(created_at: current_time.all_day)
-                         .order(:token_number_only)
-                         .limit(10)
+      if active_slot.present?
+        session_now = "Slot-#{active_slot.id}"
+        
+        # Fakt aa active slot na j 'Pending' appointments batavo
+        apps = organization.appointments
+                           .where(status: :pending, session_name: session_now)
+                           .where(created_at: current_time.all_day)
+                           .order(:token_number_only)
+                           .limit(10)
+      else
+        apps = []
+        session_now = "Break Time"
+      end
     else
       apps = []
-      session_now = "No Control Set"
+      session_now = "Closed Today"
     end
   %>
 
@@ -32,12 +42,11 @@
       <tbody>
         <% if apps.any? %>
           <% apps.each_with_index do |app, index| %>
-            <%# Row sizes: Current (Index 0) thodi highlight, baki badhi normal %>
             <tr style="background: <%= index == 0 ? '#27ae60' : '#2c3e50' %>; 
-                       font-size: <%= index == 0 ? '38px' : '28px' %>; 
+                       font-size: <%= index == 0 ? '42px' : '30px' %>; 
                        color: white; border-radius: 12px; transition: all 0.3s ease;">
               
-              <td style="padding: 15px 30px; border-radius: 12px 0 0 12px; font-weight: bold; border-left: 6px solid <%= index == 0 ? '#f1c40f' : 'transparent' %>;">
+              <td style="padding: 15px 30px; border-radius: 12px 0 0 12px; font-weight: bold; border-left: 8px solid <%= index == 0 ? '#f1c40f' : 'transparent' %>;">
                 <%= app.token_number %>
               </td>
 
@@ -47,11 +56,11 @@
 
               <td style="padding: 15px 30px; border-radius: 0 12px 12px 0;">
                 <% if index == 0 %>
-                  <span style="background: #ffffff; color: #27ae60; padding: 4px 18px; border-radius: 20px; font-weight: bold; font-size: 18px; vertical-align: middle; display: inline-block;">
-                    ● CURRENT
+                  <span style="background: #ffffff; color: #27ae60; padding: 5px 20px; border-radius: 20px; font-weight: bold; font-size: 20px; vertical-align: middle; display: inline-block;">
+                    ● NOW SERVING
                   </span>
                 <% else %>
-                  <span style="color: #bdc3c7; font-size: 16px; font-weight: bold; text-transform: uppercase;">
+                  <span style="color: #bdc3c7; font-size: 18px; font-weight: bold; text-transform: uppercase;">
                     Waiting
                   </span>
                 <% end %>
@@ -61,10 +70,10 @@
         <% else %>
           <tr>
             <td colspan="3" style="text-align: center; padding-top: 80px;">
-              <div style="font-size: 60px; margin-bottom: 10px;">☕</div>
-              <h2 style="font-size: 32px; color: #bdc3c7; margin: 0;">No Patients in <%= session_now %> Queue</h2>
-              <p style="font-size: 18px; color: #7f8c8d; margin-top: 10px;">
-                Everything is up to date • <%= current_time.strftime("%I:%M %p") %>
+              <div style="font-size: 80px; margin-bottom: 20px;">☕</div>
+              <h2 style="font-size: 40px; color: #bdc3c7; margin: 0;">No Patients in Queue</h2>
+              <p style="font-size: 20px; color: #7f8c8d; margin-top: 15px;">
+                Status: <strong style="color: #3498db;"><%= session_now %></strong> • <%= current_time.strftime("%I:%M %p") %>
               </p>
             </td>
           </tr>
@@ -73,3 +82,5 @@
     </table>
   </div>
 </div>
+
+

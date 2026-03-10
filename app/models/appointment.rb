@@ -1,44 +1,49 @@
 # new code 
-
 class Appointment < ApplicationRecord
-include ActionView::RecordIdentifier 
+  include ActionView::RecordIdentifier 
   belongs_to :organization
 
-validates :patient_name, presence: true
-validates :patient_phone, presence: true
-
+  validates :patient_name, presence: true
+  validates :patient_phone, presence: true
   validates :patient_email, presence: true
 
   enum :status, { pending: 0, completed: 1, skipped: 2, deleted: 3 }, default: :pending
 
   before_create :generate_token
 
-after_commit :broadcast_updates, on: [:create, :update, :destroy]
-after_commit :broadcast_to_tv, on: [ :create, :update, :destroy]
-after_commit :broadcast_to_patient_portal, on: [:create, :update, :destroy]
+  after_commit :broadcast_updates, on: [:create, :update, :destroy]
+  after_commit :broadcast_to_tv, on: [ :create, :update, :destroy]
+  after_commit :broadcast_to_patient_portal, on: [:create, :update, :destroy]
 
   def generate_token
     current_time = Time.zone.now
     day_name = current_time.strftime("%A")
     control = organization.booking_controls.find_by(day_name: day_name)
     
-    if control.present?
-      e_start_time = control.evening_start_time.strftime("%H:%M")
-      current_time_str = current_time.strftime("%H:%M")
-
-      if current_time_str < e_start_time
-        self.session_name = "Morning"
+  if control.present?
+      now_str = current_time.strftime("%H:%M")
+      
+      active_slot = control.booking_slots
+                           .where("strftime('%H:%M', start_time) <= ? AND strftime('%H:%M', end_time) >= ?", 
+                                  now_str, now_str).first
+      
+      if active_slot.present?
+        self.session_name = "Slot-#{active_slot.id}"
       else
-        self.session_name = "Evening"
+        self.session_name = "Off-Hours"
       end
+      
       prefix = control.token_prefix || "T"
     else
-      self.session_name = "Morning"
+      self.session_name = "Default"
       prefix = "T"
     end
 
-    # --- GAP FILLING LOGIC START ---
-    # Aaj na badha active (non-deleted) tokens na number ni list lo
+
+
+    
+
+    # --- GAP FILLING LOGIC ---
     existing_nums = organization.appointments
                                 .where(created_at: Time.zone.now.all_day, session_name: self.session_name)
                                 .where.not(status: :deleted)
@@ -57,66 +62,59 @@ after_commit :broadcast_to_patient_portal, on: [:create, :update, :destroy]
     self.token_number = "#{prefix}-#{next_num}" 
   end
 
-
-
-
   private
 
-def broadcast_updates
-  broadcast_remove_to "admin_dashboard_#{organization_id}", target: "appt_row_#{id}"
+  def broadcast_updates
+    broadcast_remove_to "admin_dashboard_#{organization_id}", target: "appt_row_#{id}"
+    target_id = "#{status}_appointments"
 
-  target_id = "#{status}_appointments"
-
-  if status == 'pending'
-    broadcast_prepend_to "admin_dashboard_#{organization_id}", 
-                         target: target_id, 
-                         partial: "admin/dashboard/appointment_row", 
-                         locals: { appt: self }
-  else
-    broadcast_append_to "admin_dashboard_#{organization_id}", 
-                        target: target_id, 
-                        partial: "admin/dashboard/appointment_row", 
-                        locals: { appt: self }
-  end
-  
+    if status == 'pending'
+      broadcast_prepend_to "admin_dashboard_#{organization_id}", 
+                           target: target_id, 
+                           partial: "admin/dashboard/appointment_row", 
+                           locals: { appt: self }
+    else
+      broadcast_append_to "admin_dashboard_#{organization_id}", 
+                          target: target_id, 
+                          partial: "admin/dashboard/appointment_row", 
+                          locals: { appt: self }
+    end
+    
   broadcast_remove_to "admin_dashboard_#{organization_id}", target: "#{status}_empty_row"
-["pending", "completed", "skipped", "deleted"].each do |s|
-    if organization.appointments.where(created_at: Time.zone.now.all_day, status: s).count == 0
+
+  # AA LOOP MA SUDHARO:
+  ["pending", "completed", "skipped", "deleted"].each do |s|
+    # Have apde database na count sathe current status check kariye chhiye
+    count = organization.appointments.where(created_at: Time.zone.now.all_day, status: s).count
+    
+    # Jo count 0 hoy to message append karo
+    if count == 0
       broadcast_append_to "admin_dashboard_#{organization_id}",
                           target: "#{s}_appointments",
                           partial: "admin/dashboard/empty_row",
                           locals: { status: s }
     end
   end
+  end
 
-def broadcast_to_patient_portal
-  today_session_appts = organization.appointments.where(
-    created_at: Time.zone.now.all_day, 
-    session_name: self.session_name
-  )
+  def broadcast_to_patient_portal
+    today_session_appts = organization.appointments.where(
+      created_at: Time.zone.now.all_day, 
+      session_name: self.session_name
+    )
 
-  # 
-  curr_token = today_session_appts.where(status: :pending).order(:token_number_only).first&.token_number || 0
+    curr_token = today_session_appts.where(status: :pending).order(:token_number_only).first&.token_number || 0
+    lst_token = today_session_appts.where.not(status: :deleted).order(:token_number_only).last&.token_number || 0
 
- 
-  lst_token = today_session_appts.where.not(status: :deleted).order(:token_number_only).last&.token_number || 0
+    broadcast_update_to "patient_info_channel_#{organization_id}",
+                        target: "current_token_display",
+                        html: curr_token
 
-  # --- LIVE UPDATES ---
+    broadcast_update_to "patient_info_channel_#{organization_id}",
+                        target: "last_token_display",
+                        html: lst_token
+  end
 
-  # Live update Current Token
-  broadcast_update_to "patient_info_channel_#{organization_id}",
-                      target: "current_token_display",
-                      html: curr_token
-
-  # Live update Last Token
-  broadcast_update_to "patient_info_channel_#{organization_id}",
-                      target: "last_token_display",
-                      html: lst_token
-end
-
-
-end
-  
   def broadcast_to_tv
     broadcast_replace_to "tv_channel_#{organization_id}", 
                          target: "tv_token_list",
@@ -124,7 +122,6 @@ end
                          locals: { organization: organization }
   end
 end
-
 
 
 

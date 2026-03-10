@@ -19,15 +19,18 @@ class AppointmentsController < ApplicationController
     # 2. Check Time Logic
     if @booking_control.present?
       current_time_str = Time.zone.now.strftime("%H:%M")
-      is_morning = current_time_str < @booking_control.evening_start_time.strftime("%H:%M")
-      start_t = is_morning ? @booking_control.morning_start_time.strftime("%H:%M") : @booking_control.evening_start_time.strftime("%H:%M")
-      end_t   = is_morning ? @booking_control.morning_end_time.strftime("%H:%M") : @booking_control.evening_end_time.strftime("%H:%M")
-      @session_label = is_morning ? "Morning" : "Evening"
+      
 
-      unless current_time_str.between?(start_t, end_t)
-        flash.now[:alert] = "Booking for #{today_name} is only open between #{start_t} and #{end_t}."
+      @active_slot = @booking_control.booking_slots
+                                     .where("strftime('%H:%M', start_time) <= ? AND strftime('%H:%M', end_time) >= ?", 
+                                            current_time_str, current_time_str).first
+if @active_slot.present?
+        @session_label = "Slot-#{@active_slot.id}"
+      else
+        flash.now[:alert] = "Booking is currently closed. Please check the hospital Bookin Time slots."
         return render_turbo_flash
       end
+
     else
       flash.now[:alert] = "Hospital is closed today (#{today_name})."
       return render_turbo_flash
@@ -40,18 +43,25 @@ class AppointmentsController < ApplicationController
 
   def create
     @organization = Organization.find(params[:appointment][:organization_id])
-    @appointment = @organization.appointments.new(appointment_params)
 
     today_name = Time.zone.now.strftime("%A") 
     control = @organization.booking_controls.find_by(day_name: today_name)
+
+    current_time_str = Time.zone.now.strftime("%H:%M")
+    active_slot = control&.booking_slots
+                         &.where("strftime('%H:%M', start_time) <= ? AND strftime('%H:%M', end_time) >= ?", 
+                                 current_time_str, current_time_str)&.first
+
     
     if control.nil? || @organization.is_booking_stopped
       flash.now[:alert] = "Booking is not available right now."
       return render_turbo_flash
     end
 
-    current_time_str = Time.zone.now.strftime("%H:%M")
-    session_name = (current_time_str < control.evening_start_time.strftime("%H:%M")) ? "Morning" : "Evening"
+    # current_time_str = Time.zone.now.strftime("%H:%M")
+
+session_name = "Slot-#{active_slot.id}"
+    @appointment = @organization.appointments.new(appointment_params)
     @appointment.session_name = session_name
 
     # --- GAP FILLING LOGIC (Matching with Appointment.rb) ---
@@ -80,6 +90,8 @@ class AppointmentsController < ApplicationController
       @current_serving = @organization.appointments
                                       .where(status: :pending, created_at: Time.zone.now.all_day, session_name: session_name)
                                       .minimum(:token_number_only) || 0
+
+                                      
       
       # LAST TOKEN logic (excluding deleted)
       display_last = @organization.appointments

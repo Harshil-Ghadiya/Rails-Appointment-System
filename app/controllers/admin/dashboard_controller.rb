@@ -24,6 +24,7 @@ format.html { render layout: !turbo_frame_request? }
       standalone: true,
       use_path: true
     )
+    render layout: false
   end
 
 def toggle_booking 

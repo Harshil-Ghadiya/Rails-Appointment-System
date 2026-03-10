@@ -33,8 +33,7 @@
             </tr>
           </thead>
           <tbody id="<%= section[:id] %>_appointments">
-            <% section_appts = @appointments.where(status: section[:id]) %>
-            <% if section_appts.any? %>
+<% section_appts = @appointments.select { |appt| appt.status.to_s == section[:id].to_s } %>            <% if section_appts.any? %>
               <% section_appts.each do |appt| %>
                 <%= render 'admin/dashboard/appointment_row', appt: appt %>
               <% end %>

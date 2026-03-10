@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_05_080157) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_09_083446) do
   create_table "appointments", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "organization_id"
@@ -38,6 +38,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_080157) do
     t.time "start_time"
     t.string "token_prefix"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "booking_slots", force: :cascade do |t|
+    t.integer "booking_control_id", null: false
+    t.datetime "created_at", null: false
+    t.time "end_time"
+    t.string "slot_name"
+    t.time "start_time"
+    t.datetime "updated_at", null: false
+    t.index ["booking_control_id"], name: "index_booking_slots_on_booking_control_id"
   end
 
   create_table "field_settings", force: :cascade do |t|
@@ -124,4 +134,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_080157) do
     t.index ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id"
     t.index ["user_id"], name: "index_users_roles_on_user_id"
   end
+
+  add_foreign_key "booking_slots", "booking_controls"
 end

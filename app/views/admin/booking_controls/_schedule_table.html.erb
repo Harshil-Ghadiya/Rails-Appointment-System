@@ -1,51 +1,95 @@
-<%# app/views/admin/booking_controls/_schedule_table.html.erb %>
 <div id="booking_schedule_container">
   <div style="background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #eee;">
     
     <%# Header Section %>
     <div style="display: flex; background: #f8f9fa; border-bottom: 2px solid #eee; font-weight: bold; padding: 15px 0;">
-      <div style="flex: 0 0 12%; padding-left: 20px;">Day</div>
+      <div style="flex: 0 0 15%; padding-left: 20px;">Day</div>
       <div style="flex: 0 0 10%; padding-left: 10px;">Prefix</div>
-      <div style="flex: 0 0 30%; padding-left: 10px; color: #181a1c;">Morning (Start - End)</div>
-      <div style="flex: 0 0 30%; padding-left: 10px; color: #e67e22;">Evening (Start - End)</div>
-      <div style="flex: 0 0 9%; text-align: center;">Action</div>
+      <div style="flex: 0 0 55%; padding-left: 10px; color: #2c3e50;">Current Booking Slots</div>
+      <div style="flex: 0 0 20%; text-align: center;">Action</div>
     </div>
 
-    <%# Body Section %>
     <div id="booking_rows">
       <% booking_controls.each do |control| %>
-        <%= form_with model: [:admin, control], data: { turbo: true }, html: { style: "display: flex; align-items: center; border-bottom: 1px solid #f1f1f1; padding: 12px 0; width: 100%; box-sizing: border-box;" } do |f| %>
+        <div style="display: flex; align-items: center; border-bottom: 1px solid #f1f1f1; padding: 15px 0; width: 100%;">
           
-          <%# 1. Day - 12% %>
-          <div style="flex: 0 0 12%; padding-left: 20px; box-sizing: border-box;">
+          <%# 1. Day Name %>
+          <div style="flex: 0 0 15%; padding-left: 20px;">
             <strong style="color: #2c3e50;"><%= control.day_name %></strong>
           </div>
 
-          <%# 2. Prefix - 10% %>
-          <div style="flex: 0 0 10%; padding-left: 10px; box-sizing: border-box;">
-            <%= f.text_field :token_prefix, style: "width: 45px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center;" %>
+          <%# 2. Display Prefix %>
+          <div style="flex: 0 0 10%; padding-left: 10px;">
+            <span style="background: #eef2f3; padding: 5px 12px; border-radius: 6px; font-weight: bold; color: #34495e;">
+              <%= control.token_prefix.presence || "None" %>
+            </span>
           </div>
 
-          <%# 3. Morning - 30% %>
-          <div style="flex: 0 0 30%; padding-left: 10px; display: flex; align-items: center; gap: 5px; box-sizing: border-box;">
-            <%= f.time_field :morning_start_time, value: control.morning_start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 95px;" %>
-            <span style="color: #bbb;">-</span>
-            <%= f.time_field :morning_end_time, value: control.morning_end_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 95px;" %>
+          <%# 3. Slots Display (Text Pills) %>
+          <div style="flex: 0 0 55%; padding-left: 10px; display: flex; flex-wrap: wrap; gap: 8px;">
+            <% saved_slots = control.booking_slots.reject(&:new_record?) %>
+            <% if saved_slots.any? %>
+              <% saved_slots.each do |slot| %>
+                <div style="background: #2c3e50; color: white; padding: 6px 12px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+                  <%= slot.start_time&.strftime("%H:%M") %> - <%= slot.end_time&.strftime("%H:%M") %>
+                  <%= button_to admin_booking_control_path(control, booking_control: { booking_slots_attributes: { id: slot.id, _destroy: '1' } }), 
+                                method: :patch, 
+                                data: { turbo_confirm: 'Remove this slot?' }, 
+                                style: "background: none; border: none; color: #ff7675; cursor: pointer; font-weight: bold; padding: 0; line-height: 1;" do %>
+                    ✕
+                  <% end %>
+                </div>
+              <% end %>
+            <% else %>
+              <span style="color: #bdc3c7; font-style: italic;">No slots added</span>
+            <% end %>
           </div>
 
-          <%# 4. Evening - 30% %>
-          <div style="flex: 0 0 30%; padding-left: 10px; display: flex; align-items: center; gap: 5px; box-sizing: border-box;">
-            <%= f.time_field :evening_start_time, value: control.evening_start_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 95px;" %>
-            <span style="color: #bbb;">-</span>
-            <%= f.time_field :evening_end_time, value: control.evening_end_time&.strftime("%H:%M"), style: "padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 95px;" %>
+          <%# 4. Action Button %>
+          <div style="flex: 0 0 20%; text-align: center;">
+            <button onclick="document.getElementById('modal-<%= control.id %>').style.display='block'" 
+                    style="background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+              Edit / + Slot
+            </button>
           </div>
+        </div>
 
-          <%# 5. Action - 18% (Button ne andar lavva mate padding ane width set kari) %>
-          <div style="flex: 0 0 18%; text-align: center; padding-right: 15px; box-sizing: border-box;">
-            <%= f.submit "Update", style: "background: #27ae60; color: white; border: none; padding: 10px 0; border-radius: 8px; cursor: pointer; font-weight: bold; width: 110px; transition: 0.2s;" %>
+        <%# --- Modal for Prefix Update & Slot Addition --- %>
+        <div id="modal-<%= control.id %>" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+          <div style="background-color: white; margin: 10% auto; padding: 25px; border-radius: 12px; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <h3 style="margin-top: 0; color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 10px;">Setup <%= control.day_name %></h3>
+            
+            <%= form_with model: [:admin, control], local: true do |f| %>
+              
+              <%# Edit Prefix Ahiya Mukyu chhe %>
+              <div style="margin-bottom: 20px; background: #f9f9f9; padding: 10px; border-radius: 8px;">
+                <label style="font-size: 12px; font-weight: bold; color: #7f8c8d; text-transform: uppercase;">Day Prefix (e.g. MON)</label>
+                <%= f.text_field :token_prefix, placeholder: "Prefix", style: "width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px; box-sizing: border-box; font-weight: bold;" %>
+              </div>
+
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+              <%# Add New Slot Fields %>
+              <p style="font-size: 12px; font-weight: bold; color: #7f8c8d; margin-bottom: 10px;">ADD NEW TIME SLOT</p>
+              <%= f.fields_for :booking_slots, control.booking_slots.build do |slot_f| %>
+                <div style="margin-bottom: 15px;">
+                  <label style="font-size: 13px;">Start Time</label>
+                  <%= slot_f.time_field :start_time, style: "width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px; box-sizing: border-box;" %>
+                </div>
+                <div style="margin-bottom: 20px;">
+                  <label style="font-size: 13px;">End Time</label>
+                  <%= slot_f.time_field :end_time, style: "width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px; box-sizing: border-box;" %>
+                </div>
+              <% end %>
+
+              <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                <button type="button" onclick="document.getElementById('modal-<%= control.id %>').style.display='none'" 
+                        style="background: #eee; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; color: #333;">Cancel</button>
+                <%= f.submit "Save Changes", style: "background: #27ae60; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;" %>
+              </div>
+            <% end %>
           </div>
-
-        <% end %>
+        </div>
       <% end %>
     </div>
   </div>
